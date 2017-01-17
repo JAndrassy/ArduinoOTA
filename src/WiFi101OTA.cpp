@@ -18,7 +18,7 @@
 
 #include <SD.h>
 
-#include "OTA.h"
+#include <SDU.h>
 
 #include "WiFi101OTA.h"
 
@@ -243,7 +243,7 @@ void WiFiOTAClass::pollServer()
 
       delay(250);
 
-      OTA.reset();
+      SDU.reset();
     } else {
       SD.remove(UPDATE_FILE);
 
