@@ -18,8 +18,6 @@
 
 #include <SD.h>
 
-#include <SDU.h>
-
 #include "WiFi101OTA.h"
 
 #define UPDATE_FILE "UPDATE.BIN"
@@ -243,7 +241,9 @@ void WiFiOTAClass::pollServer()
 
       delay(250);
 
-      SDU.reset();
+      // Reset the device
+      NVIC_SystemReset() ;
+      while (true);
     } else {
       SD.remove(UPDATE_FILE);
 

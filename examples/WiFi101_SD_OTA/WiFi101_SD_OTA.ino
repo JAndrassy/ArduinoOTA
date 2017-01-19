@@ -23,6 +23,7 @@
 #include <SD.h>
 #include <WiFi101.h>
 #include <WiFi101OTA.h>
+#include <SDU.h>
 
 char ssid[] = "yourNetwork";      // your network SSID (name)
 char pass[] = "secretPassword";   // your network password
