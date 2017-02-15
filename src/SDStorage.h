@@ -16,35 +16,24 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#ifndef _WIFI101_OTA_H_INCLUDED
-#define _WIFI101_OTA_H_INCLUDED
+#ifndef _SD_STORAGE_H_INCLUDED
+#define _SD_STORAGE_H_INCLUDED
 
-#include "WiFi101.h"
-#include "WiFiUdp.h"
+#include <SD.h>
 
 #include "OTAStorage.h"
-#include "SDStorage.h"
 
-class WiFiOTAClass {
+class SDStorageClass : public OTAStorage {
 public:
-  WiFiOTAClass();
-
-  void begin(OTAStorage& storage);
-  void poll();
-
-private:
-  void pollMdns();
-  void pollServer();
-  void sendHttpResponse(Client& client, int code, const char* status);
+  virtual int open();
+  virtual size_t write(uint8_t);
+  virtual void close();
+  virtual void clear();
 
 private:
-  OTAStorage* _storage;
-  WiFiServer _server;
-  WiFiUDP _mdnsSocket;
-
-  uint32_t _lastMdnsResponseTime;
+  File _file;
 };
 
-extern WiFiOTAClass WiFiOTA;
+extern SDStorageClass SDStorage;
 
 #endif

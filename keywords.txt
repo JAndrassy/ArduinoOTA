@@ -8,6 +8,7 @@
 
 WiFi101OTA	KEYWORD1
 WiFiOTA	KEYWORD1
+SDStorage	KEYWORD1
 
 #######################################
 # Methods and Functions (KEYWORD2)
