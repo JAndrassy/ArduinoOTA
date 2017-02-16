@@ -16,11 +16,7 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#include <SD.h>
-
 #include "WiFi101OTA.h"
-
-#define UPDATE_FILE "UPDATE.BIN"
 
 #if defined(ARDUINO_SAMD_ZERO)
   #define BOARD "arduino_zero_edbg"
@@ -35,13 +31,16 @@
 #define BOARD_LENGTH (sizeof(BOARD) - 1)
 
 WiFiOTAClass::WiFiOTAClass() :
+  _storage(NULL),
   _server(65280),
   _lastMdnsResponseTime(0)
 {
 }
 
-void WiFiOTAClass::begin()
+void WiFiOTAClass::begin(OTAStorage& storage)
 {
+  _storage = &storage;
+
   _server.begin();
 
   _mdnsSocket.beginMulti(IPAddress(224, 0, 0, 251), 5353);
@@ -217,9 +216,7 @@ void WiFiOTAClass::pollServer()
       return;
     }
 
-    File out = SD.open(UPDATE_FILE, FILE_WRITE);
-
-    if (!out) {
+    if (_storage == NULL || !_storage->open()) {
       sendHttpResponse(client, 500, "Internal Server Error");
       return;
     }
@@ -230,11 +227,11 @@ void WiFiOTAClass::pollServer()
       if (client.available()) {
         read++;
 
-        out.write((char)client.read());
+        _storage->write((char)client.read());
       }
     }
 
-    out.close();
+    _storage->close();
 
     if (read == contentLength) {
       sendHttpResponse(client, 200, "OK");
@@ -245,7 +242,7 @@ void WiFiOTAClass::pollServer()
       NVIC_SystemReset() ;
       while (true);
     } else {
-      SD.remove(UPDATE_FILE);
+      _storage->clear();
 
       client.stop();
     }

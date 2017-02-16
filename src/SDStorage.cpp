@@ -16,35 +16,34 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#ifndef _WIFI101_OTA_H_INCLUDED
-#define _WIFI101_OTA_H_INCLUDED
+#include <SDStorage.h>
 
-#include "WiFi101.h"
-#include "WiFiUdp.h"
+#define UPDATE_FILE "UPDATE.BIN"
 
-#include "OTAStorage.h"
-#include "SDStorage.h"
+int SDStorageClass::open()
+{
+  _file = SD.open(UPDATE_FILE, FILE_WRITE);
 
-class WiFiOTAClass {
-public:
-  WiFiOTAClass();
+  if (!_file) {
+    return 0;
+  }
 
-  void begin(OTAStorage& storage);
-  void poll();
+  return 1;
+}
 
-private:
-  void pollMdns();
-  void pollServer();
-  void sendHttpResponse(Client& client, int code, const char* status);
+size_t SDStorageClass::write(uint8_t b)
+{
+  return _file.write(b);
+}
 
-private:
-  OTAStorage* _storage;
-  WiFiServer _server;
-  WiFiUDP _mdnsSocket;
+void SDStorageClass::close()
+{
+  _file.close();
+}
 
-  uint32_t _lastMdnsResponseTime;
-};
+void SDStorageClass::clear()
+{
+  SD.remove(UPDATE_FILE);
+}
 
-extern WiFiOTAClass WiFiOTA;
-
-#endif
+SDStorageClass SDStorage;
