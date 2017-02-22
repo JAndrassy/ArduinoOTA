@@ -37,8 +37,10 @@ WiFiOTAClass::WiFiOTAClass() :
 {
 }
 
-void WiFiOTAClass::begin(OTAStorage& storage)
+void WiFiOTAClass::begin(const char* name, const char* password, OTAStorage& storage)
 {
+  _name = name;
+  _password = password;
   _storage = &storage;
 
   _server.begin();
@@ -110,7 +112,7 @@ void WiFiOTAClass::pollMdns()
   };
   _mdnsSocket.write(responseHeader, sizeof(responseHeader));
 
-  const byte ptrRecord[] = {
+  const byte ptrRecordStart[] = {
     0x08,
     '_', 'a', 'r', 'd', 'u', 'i', 'n', 'o',
     
@@ -125,12 +127,17 @@ void WiFiOTAClass::pollMdns()
     0x00, 0x01, // class IN
     0x00, 0x00, 0x11, 0x94, // TTL
 
-    0x00, 0x0a, // length
-    0x07,
-     'A', 'r', 'd', 'u', 'i', 'n', 'o',
+    0x00, (byte)(_name.length() + 3), // length
+    (byte)_name.length()
+  };
+
+  const byte ptrRecordEnd[] = {
     0xc0, 0x0c
   };
-  _mdnsSocket.write(ptrRecord, sizeof(ptrRecord));
+
+  _mdnsSocket.write(ptrRecordStart, sizeof(ptrRecordStart));
+  _mdnsSocket.write(_name.c_str(), _name.length());
+  _mdnsSocket.write(ptrRecordEnd, sizeof(ptrRecordEnd));
 
 
   const byte txtRecord[] = {
@@ -138,11 +145,13 @@ void WiFiOTAClass::pollMdns()
     0x00, 0x10, // TXT strings
     0x80, 0x01, // class
     0x00, 0x00, 0x11, 0x94, // TTL
-    0x00, (34 + BOARD_LENGTH),
+    0x00, (50 + BOARD_LENGTH),
     13,
     's', 's', 'h', '_', 'u', 'p', 'l', 'o', 'a', 'd', '=', 'n', 'o',
     12,
     't', 'c', 'p', '_', 'c', 'h', 'e', 'c', 'k', '=', 'n', 'o',
+    15,
+    'a', 'u', 't', 'h', '_', 'u', 'p', 'l', 'o', 'a', 'd', '=', 'y', 'e', 's',
     (6 + BOARD_LENGTH),
     'b', 'o', 'a', 'r', 'd', '=',
   };
@@ -167,7 +176,8 @@ void WiFiOTAClass::pollMdns()
 
   uint32_t localIp = WiFi.localIP();
 
-  byte aRecordOffset = sizeof(ptrRecord) + sizeof(txtRecord) + BOARD_LENGTH + sizeof(srvRecord) + 2;
+  byte aRecordOffset = sizeof(ptrRecordStart) + _name.length() + sizeof(ptrRecordEnd) + 
+                         sizeof(txtRecord) + BOARD_LENGTH + sizeof(srvRecord) + 2;
 
   byte aRecord[] = {
     0xc0, aRecordOffset,

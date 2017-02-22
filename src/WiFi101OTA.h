@@ -19,6 +19,8 @@
 #ifndef _WIFI101_OTA_H_INCLUDED
 #define _WIFI101_OTA_H_INCLUDED
 
+#include <Arduino.h>
+
 #include "WiFi101.h"
 #include "WiFiUdp.h"
 
@@ -29,7 +31,7 @@ class WiFiOTAClass {
 public:
   WiFiOTAClass();
 
-  void begin(OTAStorage& storage);
+  void begin(const char* name, const char* password, OTAStorage& storage);
   void poll();
 
 private:
@@ -38,6 +40,8 @@ private:
   void sendHttpResponse(Client& client, int code, const char* status);
 
 private:
+  String _name;
+  String _password;
   OTAStorage* _storage;
   WiFiServer _server;
   WiFiUDP _mdnsSocket;
