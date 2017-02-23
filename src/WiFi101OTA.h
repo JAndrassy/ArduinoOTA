@@ -41,7 +41,7 @@ private:
 
 private:
   String _name;
-  String _password;
+  String _expectedAuthorization;
   OTAStorage* _storage;
   WiFiServer _server;
   WiFiUDP _mdnsSocket;

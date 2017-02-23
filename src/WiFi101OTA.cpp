@@ -16,6 +16,9 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+#include <Arduino.h>
+#include <rBase64.h>
+
 #include "WiFi101OTA.h"
 
 #if defined(ARDUINO_SAMD_ZERO)
@@ -40,7 +43,7 @@ WiFiOTAClass::WiFiOTAClass() :
 void WiFiOTAClass::begin(const char* name, const char* password, OTAStorage& storage)
 {
   _name = name;
-  _password = password;
+  _expectedAuthorization = "Basic " + rbase64.encode("arduino:" + String(password));
   _storage = &storage;
 
   _server.begin();
@@ -139,7 +142,6 @@ void WiFiOTAClass::pollMdns()
   _mdnsSocket.write(_name.c_str(), _name.length());
   _mdnsSocket.write(ptrRecordEnd, sizeof(ptrRecordEnd));
 
-
   const byte txtRecord[] = {
     0xc0, 0x2b,
     0x00, 0x10, // TXT strings
@@ -158,29 +160,30 @@ void WiFiOTAClass::pollMdns()
   _mdnsSocket.write(txtRecord, sizeof(txtRecord));
   _mdnsSocket.write((byte*)BOARD, BOARD_LENGTH);
 
-  const byte srvRecord[] = {
+  const byte srvRecordStart[] = {
     0xc0, 0x2b, 
     0x00, 0x21, // SRV
     0x80, 0x01, // class
     0x00, 0x00, 0x00, 0x78, // TTL
-    0x00, 0x10, // length
+    0x00, (byte)(_name.length() + 9), // length
     0x00, 0x00,
     0x00, 0x00,
     0xff, 0x00, // port
-    0x07,
-    'A', 'r', 'd', 'u', 'i', 'n', 'o',
+    (byte)_name.length()
+  };
+
+  const byte srvRecordEnd[] = {
     0xc0, 0x1a
   };
-  _mdnsSocket.write(srvRecord, sizeof(srvRecord));
 
+  _mdnsSocket.write(srvRecordStart, sizeof(srvRecordStart));
+  _mdnsSocket.write(_name.c_str(), _name.length());
+  _mdnsSocket.write(srvRecordEnd, sizeof(srvRecordEnd));
 
   uint32_t localIp = WiFi.localIP();
 
-  byte aRecordOffset = sizeof(ptrRecordStart) + _name.length() + sizeof(ptrRecordEnd) + 
-                         sizeof(txtRecord) + BOARD_LENGTH + sizeof(srvRecord) + 2;
-
   byte aRecord[] = {
-    0xc0, aRecordOffset,
+    0xc0, (byte)(0x8f + _name.length()),
 
     0x00, 0x01, // A record
     0x80, 0x01, // class
@@ -209,6 +212,7 @@ void WiFiOTAClass::pollServer()
 
     String header;
     long contentLength = -1;
+    String authorization;
 
     do {
       header = client.readStringUntil('\n');
@@ -218,8 +222,17 @@ void WiFiOTAClass::pollServer()
         header.remove(0, 16);
 
         contentLength = header.toInt();
+      } else if (header.startsWith("Authorization: ")) {
+        header.remove(0, 15);
+
+        authorization = header;
       }
     } while (header != "");
+
+    if (_expectedAuthorization != authorization) {
+      sendHttpResponse(client, 401, "Bad Request");
+      return;
+    }
 
     if (contentLength <= 0) {
       sendHttpResponse(client, 400, "Bad Request");
