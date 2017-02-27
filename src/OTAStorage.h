@@ -25,6 +25,7 @@ public:
   virtual size_t write(uint8_t) = 0;
   virtual void close() = 0;
   virtual void clear() = 0;
+  virtual void apply() = 0;
 };
 
 #endif

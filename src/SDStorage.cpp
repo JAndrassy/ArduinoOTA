@@ -16,7 +16,7 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#include <SDStorage.h>
+#include "SDStorage.h"
 
 #define UPDATE_FILE "UPDATE.BIN"
 
@@ -44,6 +44,12 @@ void SDStorageClass::close()
 void SDStorageClass::clear()
 {
   SD.remove(UPDATE_FILE);
+}
+
+void SDStorageClass::apply()
+{
+  // just reset, SDU copies the data to flash
+  NVIC_SystemReset();
 }
 
 SDStorageClass SDStorage;

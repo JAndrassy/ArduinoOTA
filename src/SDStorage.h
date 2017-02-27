@@ -29,6 +29,7 @@ public:
   virtual size_t write(uint8_t);
   virtual void close();
   virtual void clear();
+  virtual void apply();
 
 private:
   File _file;

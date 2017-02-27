@@ -16,40 +16,29 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#ifndef _WIFI101_OTA_H_INCLUDED
-#define _WIFI101_OTA_H_INCLUDED
-
-#include <Arduino.h>
-
-#include "WiFi101.h"
-#include "WiFiUdp.h"
+#ifndef _INTERNAL_STORAGE_H_INCLUDED
+#define _INTERNAL_STORAGE_H_INCLUDED
 
 #include "OTAStorage.h"
-#include "SDStorage.h"
-#include "InternalStorage.h"
 
-class WiFiOTAClass {
+class InternalStorageClass : public OTAStorage {
 public:
-  WiFiOTAClass();
-
-  void begin(const char* name, const char* password, OTAStorage& storage);
-  void poll();
-
-private:
-  void pollMdns();
-  void pollServer();
-  void sendHttpResponse(Client& client, int code, const char* status);
+  virtual int open();
+  virtual size_t write(uint8_t);
+  virtual void close();
+  virtual void clear();
+  virtual void apply();
 
 private:
-  String _name;
-  String _expectedAuthorization;
-  OTAStorage* _storage;
-  WiFiServer _server;
-  WiFiUDP _mdnsSocket;
+  union {
+    uint32_t u32;
+    uint8_t u8[4];
+  } _addressData;
 
-  uint32_t _lastMdnsResponseTime;
+  int _writeIndex;
+  uint32_t* _writeAddress;
 };
 
-extern WiFiOTAClass WiFiOTA;
+extern InternalStorageClass InternalStorage;
 
 #endif

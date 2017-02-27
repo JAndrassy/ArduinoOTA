@@ -261,8 +261,9 @@ void WiFiOTAClass::pollServer()
 
       delay(250);
 
-      // Reset the device
-      NVIC_SystemReset() ;
+      // apply the update
+      _storage->apply();
+      
       while (true);
     } else {
       _storage->clear();
