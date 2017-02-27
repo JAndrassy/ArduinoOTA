@@ -59,7 +59,7 @@ void setup() {
   }
 
   // start the WiFi OTA library with SD based storage
-  WiFiOTA.begin(SDStorage);
+  WiFiOTA.begin("Arduino", "password", SDStorage);
 
   // you're connected now, so print out the status:
   printWifiStatus();
