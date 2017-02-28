@@ -205,11 +205,6 @@ void WiFiOTAClass::pollServer()
     String request = client.readStringUntil('\n');
     request.trim();
 
-    if (request != "POST /sketch HTTP/1.1") {
-      sendHttpResponse(client, 404, "Not Found");
-      return;
-    }
-
     String header;
     long contentLength = -1;
     String authorization;
@@ -229,8 +224,15 @@ void WiFiOTAClass::pollServer()
       }
     } while (header != "");
 
+    if (request != "POST /sketch HTTP/1.1") {
+      flushRequestBody(client, contentLength);
+      sendHttpResponse(client, 404, "Not Found");
+      return;
+    }
+
     if (_expectedAuthorization != authorization) {
-      sendHttpResponse(client, 401, "Bad Request");
+      flushRequestBody(client, contentLength);
+      sendHttpResponse(client, 401, "Unauthorized");
       return;
     }
 
@@ -240,6 +242,7 @@ void WiFiOTAClass::pollServer()
     }
 
     if (_storage == NULL || !_storage->open()) {
+      flushRequestBody(client, contentLength);
       sendHttpResponse(client, 500, "Internal Server Error");
       return;
     }
@@ -278,7 +281,7 @@ void WiFiOTAClass::sendHttpResponse(Client& client, int code, const char* status
   while (client.available()) {
     client.read();
   }
-  
+
   client.print("HTTP/1.1 ");
   client.print(code);
   client.print(" ");
@@ -286,6 +289,19 @@ void WiFiOTAClass::sendHttpResponse(Client& client, int code, const char* status
   client.println("Connection: close");
   client.println();
   client.stop();
+}
+
+void WiFiOTAClass::flushRequestBody(Client& client, long contentLength)
+{
+  long read = 0;
+
+  while (client.connected() && read < contentLength) {
+    if (client.available()) {
+      read++;
+
+      client.read();
+    }
+  }
 }
 
 WiFiOTAClass WiFiOTA;

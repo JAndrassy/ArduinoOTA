@@ -39,6 +39,7 @@ private:
   void pollMdns();
   void pollServer();
   void sendHttpResponse(Client& client, int code, const char* status);
+  void flushRequestBody(Client& client, long contentLength);
 
 private:
   String _name;
