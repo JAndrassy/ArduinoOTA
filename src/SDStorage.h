@@ -23,6 +23,10 @@
 
 #include "OTAStorage.h"
 
+#ifndef SDCARD_SS_PIN
+#define SDCARD_SS_PIN 4
+#endif
+
 class SDStorageClass : public OTAStorage {
 public:
   virtual int open();
