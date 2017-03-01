@@ -182,8 +182,13 @@ void WiFiOTAClass::pollMdns()
 
   uint32_t localIp = WiFi.localIP();
 
+  byte aRecordNameOffset = sizeof(responseHeader) +
+                            sizeof(ptrRecordStart) + _name.length() + sizeof(ptrRecordEnd) + 
+                            sizeof(txtRecord) + BOARD_LENGTH +
+                            sizeof(srvRecordStart) - 1;
+
   byte aRecord[] = {
-    0xc0, (byte)(0x8f + _name.length()),
+    0xc0, aRecordNameOffset,
 
     0x00, 0x01, // A record
     0x80, 0x01, // class
