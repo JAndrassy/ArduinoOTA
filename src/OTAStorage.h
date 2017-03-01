@@ -26,6 +26,10 @@ public:
   virtual void close() = 0;
   virtual void clear() = 0;
   virtual void apply() = 0;
+
+  virtual long maxSize() {
+    return ((256 * 1024) - 0x2000);
+  }
 };
 
 #endif

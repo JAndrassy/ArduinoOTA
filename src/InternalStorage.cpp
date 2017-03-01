@@ -112,4 +112,9 @@ void InternalStorageClass::apply()
   copyFlashAndReset(SKETCH_START_ADDRESS, STORAGE_START_ADDRESS, MAX_PARTIONED_SKETCH_SIZE);
 }
 
+long InternalStorageClass::maxSize()
+{
+  return MAX_PARTIONED_SKETCH_SIZE;
+}
+
 InternalStorageClass InternalStorage;

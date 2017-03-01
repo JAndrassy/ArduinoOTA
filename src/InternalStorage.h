@@ -28,6 +28,7 @@ public:
   virtual void close();
   virtual void clear();
   virtual void apply();
+  virtual long maxSize();
 
 private:
   union {
