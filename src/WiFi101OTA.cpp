@@ -17,7 +17,6 @@
 */
 
 #include <Arduino.h>
-#include <rBase64.h>
 
 #include "WiFi101OTA.h"
 
@@ -33,6 +32,41 @@
 
 #define BOARD_LENGTH (sizeof(BOARD) - 1)
 
+static String base64Encode(const String& in)
+{
+  static const char* CODES = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
+
+  int b;
+  String out;
+  out.reserve((in.length()) * 4 / 3);
+  
+  for (unsigned int i = 0; i < in.length(); i += 3) {
+    b = (in.charAt(i) & 0xFC) >> 2;
+    out += CODES[b];
+
+    b = (in.charAt(i) & 0x03) << 4;
+    if (i + 1 < in.length()) {
+      b |= (in.charAt(i + 1) & 0xF0) >> 4;
+      out += CODES[b];
+      b = (in.charAt(i + 1) & 0x0F) << 2;
+      if (i + 2 < in.length()) {
+         b |= (in.charAt(i + 2) & 0xC0) >> 6;
+         out += CODES[b];
+         b = in.charAt(i + 2) & 0x3F;
+         out += CODES[b];
+      } else {
+        out += CODES[b];
+        out += '=';
+      }
+    } else {
+      out += CODES[b];
+      out += "==";
+    }
+  }
+
+  return out;
+}
+
 WiFiOTAClass::WiFiOTAClass() :
   _storage(NULL),
   _server(65280),
@@ -43,7 +77,7 @@ WiFiOTAClass::WiFiOTAClass() :
 void WiFiOTAClass::begin(const char* name, const char* password, OTAStorage& storage)
 {
   _name = name;
-  _expectedAuthorization = "Basic " + rbase64.encode("arduino:" + String(password));
+  _expectedAuthorization = "Basic " + base64Encode("arduino:" + String(password));
   _storage = &storage;
 
   _server.begin();
