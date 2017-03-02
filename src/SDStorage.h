@@ -23,12 +23,17 @@
 
 #include "OTAStorage.h"
 
+#ifndef SDCARD_SS_PIN
+#define SDCARD_SS_PIN 4
+#endif
+
 class SDStorageClass : public OTAStorage {
 public:
   virtual int open();
   virtual size_t write(uint8_t);
   virtual void close();
   virtual void clear();
+  virtual void apply();
 
 private:
   File _file;

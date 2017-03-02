@@ -8,6 +8,8 @@
 
 WiFi101OTA	KEYWORD1
 WiFiOTA	KEYWORD1
+
+InternalStorage	KEYWORD1
 SDStorage	KEYWORD1
 
 #######################################

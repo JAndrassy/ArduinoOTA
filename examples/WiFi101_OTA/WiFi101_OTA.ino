@@ -9,7 +9,6 @@
 
  Circuit:
  * WiFi shield attached
- * SD shield attached
 
  created 13 July 2010
  by dlf (Metodo2 srl)
@@ -20,10 +19,8 @@
  */
  
 #include <SPI.h>
-#include <SD.h>
 #include <WiFi101.h>
 #include <WiFi101OTA.h>
-#include <SDU.h>
 
 char ssid[] = "yourNetwork";      // your network SSID (name)
 char pass[] = "secretPassword";   // your network password
@@ -33,15 +30,6 @@ int status = WL_IDLE_STATUS;
 void setup() {
   //Initialize serial:
   Serial.begin(9600);
-
-  // setup SD card
-  Serial.print("Initializing SD card...");
-  if (!SD.begin(SDCARD_SS_PIN)) {
-    Serial.println("initialization failed!");
-    // don't continue:
-    while (true);
-  }
-  Serial.println("initialization done.");
 
   // check for the presence of the shield:
   if (WiFi.status() == WL_NO_SHIELD) {
@@ -58,8 +46,8 @@ void setup() {
     status = WiFi.begin(ssid, pass);
   }
 
-  // start the WiFi OTA library with SD based storage
-  WiFiOTA.begin("Arduino", "password", SDStorage);
+  // start the WiFi OTA library with internal (flash) based storage
+  WiFiOTA.begin("Arduino", "password", InternalStorage);
 
   // you're connected now, so print out the status:
   printWifiStatus();

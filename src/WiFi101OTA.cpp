@@ -16,6 +16,8 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+#include <Arduino.h>
+
 #include "WiFi101OTA.h"
 
 #if defined(ARDUINO_SAMD_ZERO)
@@ -30,6 +32,41 @@
 
 #define BOARD_LENGTH (sizeof(BOARD) - 1)
 
+static String base64Encode(const String& in)
+{
+  static const char* CODES = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
+
+  int b;
+  String out;
+  out.reserve((in.length()) * 4 / 3);
+  
+  for (unsigned int i = 0; i < in.length(); i += 3) {
+    b = (in.charAt(i) & 0xFC) >> 2;
+    out += CODES[b];
+
+    b = (in.charAt(i) & 0x03) << 4;
+    if (i + 1 < in.length()) {
+      b |= (in.charAt(i + 1) & 0xF0) >> 4;
+      out += CODES[b];
+      b = (in.charAt(i + 1) & 0x0F) << 2;
+      if (i + 2 < in.length()) {
+         b |= (in.charAt(i + 2) & 0xC0) >> 6;
+         out += CODES[b];
+         b = in.charAt(i + 2) & 0x3F;
+         out += CODES[b];
+      } else {
+        out += CODES[b];
+        out += '=';
+      }
+    } else {
+      out += CODES[b];
+      out += "==";
+    }
+  }
+
+  return out;
+}
+
 WiFiOTAClass::WiFiOTAClass() :
   _storage(NULL),
   _server(65280),
@@ -37,8 +74,10 @@ WiFiOTAClass::WiFiOTAClass() :
 {
 }
 
-void WiFiOTAClass::begin(OTAStorage& storage)
+void WiFiOTAClass::begin(const char* name, const char* password, OTAStorage& storage)
 {
+  _name = name;
+  _expectedAuthorization = "Basic " + base64Encode("arduino:" + String(password));
   _storage = &storage;
 
   _server.begin();
@@ -110,7 +149,7 @@ void WiFiOTAClass::pollMdns()
   };
   _mdnsSocket.write(responseHeader, sizeof(responseHeader));
 
-  const byte ptrRecord[] = {
+  const byte ptrRecordStart[] = {
     0x08,
     '_', 'a', 'r', 'd', 'u', 'i', 'n', 'o',
     
@@ -125,52 +164,65 @@ void WiFiOTAClass::pollMdns()
     0x00, 0x01, // class IN
     0x00, 0x00, 0x11, 0x94, // TTL
 
-    0x00, 0x0a, // length
-    0x07,
-     'A', 'r', 'd', 'u', 'i', 'n', 'o',
+    0x00, (byte)(_name.length() + 3), // length
+    (byte)_name.length()
+  };
+
+  const byte ptrRecordEnd[] = {
     0xc0, 0x0c
   };
-  _mdnsSocket.write(ptrRecord, sizeof(ptrRecord));
 
+  _mdnsSocket.write(ptrRecordStart, sizeof(ptrRecordStart));
+  _mdnsSocket.write(_name.c_str(), _name.length());
+  _mdnsSocket.write(ptrRecordEnd, sizeof(ptrRecordEnd));
 
   const byte txtRecord[] = {
     0xc0, 0x2b,
     0x00, 0x10, // TXT strings
     0x80, 0x01, // class
     0x00, 0x00, 0x11, 0x94, // TTL
-    0x00, (34 + BOARD_LENGTH),
+    0x00, (50 + BOARD_LENGTH),
     13,
     's', 's', 'h', '_', 'u', 'p', 'l', 'o', 'a', 'd', '=', 'n', 'o',
     12,
     't', 'c', 'p', '_', 'c', 'h', 'e', 'c', 'k', '=', 'n', 'o',
+    15,
+    'a', 'u', 't', 'h', '_', 'u', 'p', 'l', 'o', 'a', 'd', '=', 'y', 'e', 's',
     (6 + BOARD_LENGTH),
     'b', 'o', 'a', 'r', 'd', '=',
   };
   _mdnsSocket.write(txtRecord, sizeof(txtRecord));
   _mdnsSocket.write((byte*)BOARD, BOARD_LENGTH);
 
-  const byte srvRecord[] = {
+  const byte srvRecordStart[] = {
     0xc0, 0x2b, 
     0x00, 0x21, // SRV
     0x80, 0x01, // class
     0x00, 0x00, 0x00, 0x78, // TTL
-    0x00, 0x10, // length
+    0x00, (byte)(_name.length() + 9), // length
     0x00, 0x00,
     0x00, 0x00,
     0xff, 0x00, // port
-    0x07,
-    'A', 'r', 'd', 'u', 'i', 'n', 'o',
+    (byte)_name.length()
+  };
+
+  const byte srvRecordEnd[] = {
     0xc0, 0x1a
   };
-  _mdnsSocket.write(srvRecord, sizeof(srvRecord));
 
+  _mdnsSocket.write(srvRecordStart, sizeof(srvRecordStart));
+  _mdnsSocket.write(_name.c_str(), _name.length());
+  _mdnsSocket.write(srvRecordEnd, sizeof(srvRecordEnd));
 
   uint32_t localIp = WiFi.localIP();
 
-  byte aRecordOffset = sizeof(ptrRecord) + sizeof(txtRecord) + BOARD_LENGTH + sizeof(srvRecord) + 2;
+  byte aRecordNameOffset = sizeof(responseHeader) +
+                            sizeof(ptrRecordStart) + _name.length() + sizeof(ptrRecordEnd) + 
+                            sizeof(txtRecord) + BOARD_LENGTH +
+                            sizeof(srvRecordStart) - 1;
 
   byte aRecord[] = {
-    0xc0, aRecordOffset,
+    0xc0, aRecordNameOffset,
 
     0x00, 0x01, // A record
     0x80, 0x01, // class
@@ -192,13 +244,9 @@ void WiFiOTAClass::pollServer()
     String request = client.readStringUntil('\n');
     request.trim();
 
-    if (request != "POST /sketch HTTP/1.1") {
-      sendHttpResponse(client, 404, "Not Found");
-      return;
-    }
-
     String header;
     long contentLength = -1;
+    String authorization;
 
     do {
       header = client.readStringUntil('\n');
@@ -208,8 +256,24 @@ void WiFiOTAClass::pollServer()
         header.remove(0, 16);
 
         contentLength = header.toInt();
+      } else if (header.startsWith("Authorization: ")) {
+        header.remove(0, 15);
+
+        authorization = header;
       }
     } while (header != "");
+
+    if (request != "POST /sketch HTTP/1.1") {
+      flushRequestBody(client, contentLength);
+      sendHttpResponse(client, 404, "Not Found");
+      return;
+    }
+
+    if (_expectedAuthorization != authorization) {
+      flushRequestBody(client, contentLength);
+      sendHttpResponse(client, 401, "Unauthorized");
+      return;
+    }
 
     if (contentLength <= 0) {
       sendHttpResponse(client, 400, "Bad Request");
@@ -217,7 +281,15 @@ void WiFiOTAClass::pollServer()
     }
 
     if (_storage == NULL || !_storage->open()) {
+      flushRequestBody(client, contentLength);
       sendHttpResponse(client, 500, "Internal Server Error");
+      return;
+    }
+
+    if (contentLength > _storage->maxSize()) {
+      _storage->close();
+      flushRequestBody(client, contentLength);
+      sendHttpResponse(client, 413, "Payload Too Large");
       return;
     }
 
@@ -238,8 +310,9 @@ void WiFiOTAClass::pollServer()
 
       delay(250);
 
-      // Reset the device
-      NVIC_SystemReset() ;
+      // apply the update
+      _storage->apply();
+      
       while (true);
     } else {
       _storage->clear();
@@ -254,7 +327,7 @@ void WiFiOTAClass::sendHttpResponse(Client& client, int code, const char* status
   while (client.available()) {
     client.read();
   }
-  
+
   client.print("HTTP/1.1 ");
   client.print(code);
   client.print(" ");
@@ -262,6 +335,19 @@ void WiFiOTAClass::sendHttpResponse(Client& client, int code, const char* status
   client.println("Connection: close");
   client.println();
   client.stop();
+}
+
+void WiFiOTAClass::flushRequestBody(Client& client, long contentLength)
+{
+  long read = 0;
+
+  while (client.connected() && read < contentLength) {
+    if (client.available()) {
+      read++;
+
+      client.read();
+    }
+  }
 }
 
 WiFiOTAClass WiFiOTA;
