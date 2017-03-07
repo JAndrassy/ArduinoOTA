@@ -33,7 +33,7 @@ extern "C" {
   // these functions must be in RAM (.data) and NOT inlined
   // as they erase and copy the sketch data in flash
 
-  __attribute__ ((long_call, noinline, section (".data")))
+  __attribute__ ((long_call, noinline, section (".data#")))
   static void eraseFlash(int address, int length)
   {
     for (int i = 0; i < length; i += ROW_SIZE) {
@@ -44,7 +44,7 @@ extern "C" {
     }
   }
 
-  __attribute__ ((long_call, noinline, section (".data")))
+  __attribute__ ((long_call, noinline, section (".data#")))
   static void copyFlashAndReset(int dest, int src, int length)
   {
     uint32_t* d = (uint32_t*)dest;
