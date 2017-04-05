@@ -117,8 +117,11 @@ void WiFiOTAClass::pollMdns()
   };
 
   if (packetLength != sizeof(ARDUINO_SERVICE_REQUEST)) {
-    while (_mdnsSocket.available()) {
-      _mdnsSocket.read();
+    while (packetLength) {
+      if (_mdnsSocket.available()) {
+        packetLength--;
+        _mdnsSocket.read();
+      }
     }
     return;
   }
