@@ -25,8 +25,11 @@
 #include <WiFi101OTA.h>
 #include <SDU.h>
 
-char ssid[] = "yourNetwork";      // your network SSID (name)
-char pass[] = "secretPassword";   // your network password
+#include "arduino_secrets.h" 
+///////please enter your sensitive data in the Secret tab/arduino_secrets.h
+/////// Wifi Settings ///////
+char ssid[] = SECRET_SSID;      // your network SSID (name)
+char pass[] = SECRET_PASS;   // your network password
 
 int status = WL_IDLE_STATUS;
 
