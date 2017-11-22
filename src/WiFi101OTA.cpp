@@ -127,7 +127,7 @@ void WiFiOTAClass::pollMdns()
 
   _mdnsSocket.read(request, sizeof(request));
 
-  if (memcmp(request, ARDUINO_SERVICE_REQUEST, packetLength) != 0) {
+  if (memcmp(&request[2], &ARDUINO_SERVICE_REQUEST[2], packetLength - 2) != 0) {
     return;
   }
 
