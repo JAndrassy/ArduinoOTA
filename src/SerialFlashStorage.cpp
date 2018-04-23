@@ -16,14 +16,25 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#include "SDStorage.h"
+#include "SerialFlashStorage.h"
 
 #define UPDATE_FILE "UPDATE.BIN"
 
-int SDStorageClass::open(int length)
+int SerialFlashStorageClass::open(int contentLength)
 {
-  (void)length;
-  _file = SD.open(UPDATE_FILE, FILE_WRITE);
+  if (!SerialFlash.begin(SERIAL_FLASH_CS)) {
+    return 0;
+  }
+
+  while (!SerialFlash.ready()) {}
+
+  if (SerialFlash.exists(UPDATE_FILE)) {
+    SerialFlash.remove(UPDATE_FILE);
+  }
+
+  if (SerialFlash.create(UPDATE_FILE, contentLength)) {
+    _file = SerialFlash.open(UPDATE_FILE);
+  }
 
   if (!_file) {
     return 0;
@@ -32,25 +43,27 @@ int SDStorageClass::open(int length)
   return 1;
 }
 
-size_t SDStorageClass::write(uint8_t b)
+size_t SerialFlashStorageClass::write(uint8_t b)
 {
-  return _file.write(b);
+  while (!SerialFlash.ready()) {}
+  int ret = _file.write(&b, 1);
+  return ret;
 }
 
-void SDStorageClass::close()
+void SerialFlashStorageClass::close()
 {
   _file.close();
 }
 
-void SDStorageClass::clear()
+void SerialFlashStorageClass::clear()
 {
-  SD.remove(UPDATE_FILE);
+  SerialFlash.remove(UPDATE_FILE);
 }
 
-void SDStorageClass::apply()
+void SerialFlashStorageClass::apply()
 {
   // just reset, SDU copies the data to flash
   NVIC_SystemReset();
 }
 
-SDStorageClass SDStorage;
+SerialFlashStorageClass SerialFlashStorage;

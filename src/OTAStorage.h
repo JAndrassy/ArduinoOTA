@@ -21,7 +21,7 @@
 
 class OTAStorage {
 public:
-  virtual int open() = 0;
+  virtual int open(int length) = 0;
   virtual size_t write(uint8_t) = 0;
   virtual void close() = 0;
   virtual void clear() = 0;

@@ -62,8 +62,9 @@ extern "C" {
   }
 }
 
-int InternalStorageClass::open()
+int InternalStorageClass::open(int length)
 {
+  (void)length;
   _writeIndex = 0;
   _writeAddress = (uint32_t*)STORAGE_START_ADDRESS;
 

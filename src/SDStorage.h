@@ -29,7 +29,7 @@
 
 class SDStorageClass : public OTAStorage {
 public:
-  virtual int open();
+  virtual int open(int length);
   virtual size_t write(uint8_t);
   virtual void close();
   virtual void clear();
