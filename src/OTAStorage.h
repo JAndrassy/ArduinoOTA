@@ -19,6 +19,12 @@
 #ifndef _OTA_STORAGE_H_INCLUDED
 #define _OTA_STORAGE_H_INCLUDED
 
+#ifdef ARDUINO_SAM_ZERO
+#define SKETCH_START_ADDRESS        (0x4000)
+#else
+#define SKETCH_START_ADDRESS        (0x2000)
+#endif
+
 class OTAStorage {
 public:
   virtual int open(int length) = 0;
@@ -28,7 +34,7 @@ public:
   virtual void apply() = 0;
 
   virtual long maxSize() {
-    return ((256 * 1024) - 0x2000);
+    return ((256 * 1024) - SKETCH_START_ADDRESS);
   }
 };
 
