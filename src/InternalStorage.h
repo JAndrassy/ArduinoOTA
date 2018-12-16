@@ -14,6 +14,11 @@
   You should have received a copy of the GNU Lesser General Public
   License along with this library; if not, write to the Free Software
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+ WiFi101OTA version Feb 2017
+ by Sandeep Mistry (Arduino)
+ modified for ArduinoOTA Dec 2018
+ by Juraj Andrassy
 */
 
 #ifndef _INTERNAL_STORAGE_H_INCLUDED
@@ -23,6 +28,9 @@
 
 class InternalStorageClass : public OTAStorage {
 public:
+
+  InternalStorageClass();
+
   virtual int open(int length);
   virtual size_t write(uint8_t);
   virtual void close();
@@ -31,6 +39,8 @@ public:
   virtual long maxSize();
 
 private:
+  const uint32_t MAX_PARTIONED_SKETCH_SIZE, STORAGE_START_ADDRESS;
+
   union {
     uint32_t u32;
     uint8_t u8[4];

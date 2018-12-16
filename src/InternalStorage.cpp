@@ -14,47 +14,58 @@
   You should have received a copy of the GNU Lesser General Public
   License along with this library; if not, write to the Free Software
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+ WiFi101OTA version Feb 2017
+ by Sandeep Mistry (Arduino)
+ modified for ArduinoOTA Dec 2018
+ by Juraj Andrassy
 */
 
 #include <Arduino.h>
 
 #include "InternalStorage.h"
 
-#define PAGE_SIZE                   (64)
-#define PAGES                       (4096)
-#define MAX_FLASH                   (PAGE_SIZE * PAGES)
-#define ROW_SIZE                    (PAGE_SIZE * 4)
-
-#define MAX_PARTIONED_SKETCH_SIZE   ((MAX_FLASH - SKETCH_START_ADDRESS) / 2)
-#define STORAGE_START_ADDRESS       (SKETCH_START_ADDRESS + MAX_PARTIONED_SKETCH_SIZE)
+InternalStorageClass::InternalStorageClass() :
+  MAX_PARTIONED_SKETCH_SIZE((MAX_FLASH - SKETCH_START_ADDRESS) / 2),
+  STORAGE_START_ADDRESS(SKETCH_START_ADDRESS + MAX_PARTIONED_SKETCH_SIZE)
+{
+  _writeIndex = 0;
+  _writeAddress = nullptr;
+}
 
 extern "C" {
   // these functions must be in RAM (.data) and NOT inlined
   // as they erase and copy the sketch data in flash
 
+  __attribute__ ((long_call, noinline, section (".data#"))) //
+  static void waitForReady() {
+    while (!NVMCTRL->INTFLAG.bit.READY);
+  }
+
   __attribute__ ((long_call, noinline, section (".data#")))
-  static void eraseFlash(int address, int length)
+  static void eraseFlash(int address, int length, int pageSize)
   {
-    for (int i = 0; i < length; i += ROW_SIZE) {
+    int rowSize = pageSize * 4;
+    for (int i = 0; i < length; i += rowSize) {
       NVMCTRL->ADDR.reg = ((uint32_t)(address + i)) / 2;
       NVMCTRL->CTRLA.reg = NVMCTRL_CTRLA_CMDEX_KEY | NVMCTRL_CTRLA_CMD_ER;
       
-      while (!NVMCTRL->INTFLAG.bit.READY);
+      waitForReady();
     }
   }
 
   __attribute__ ((long_call, noinline, section (".data#")))
-  static void copyFlashAndReset(int dest, int src, int length)
+  static void copyFlashAndReset(int dest, int src, int length, int pageSize)
   {
     uint32_t* d = (uint32_t*)dest;
     uint32_t* s = (uint32_t*)src;
 
-    eraseFlash(dest, length);
+    eraseFlash(dest, length, pageSize);
 
     for (int i = 0; i < length; i += 4) {
       *d++ = *s++;
 
-      while (!NVMCTRL->INTFLAG.bit.READY);
+      waitForReady();
     }
 
     NVIC_SystemReset();
@@ -70,7 +81,7 @@ int InternalStorageClass::open(int length)
   // enable auto page writes
   NVMCTRL->CTRLB.bit.MANW = 0;
 
-  eraseFlash(STORAGE_START_ADDRESS, MAX_PARTIONED_SKETCH_SIZE);
+  eraseFlash(STORAGE_START_ADDRESS, MAX_PARTIONED_SKETCH_SIZE, PAGE_SIZE);
 
   return 1;
 }
@@ -87,7 +98,7 @@ size_t InternalStorageClass::write(uint8_t b)
 
     _writeAddress++;
 
-    while (!NVMCTRL->INTFLAG.bit.READY);
+    waitForReady();
   }
 
   return 1;
@@ -109,7 +120,7 @@ void InternalStorageClass::apply()
   // disable interrupts, as vector table will be erase during flash sequence
   noInterrupts();
 
-  copyFlashAndReset(SKETCH_START_ADDRESS, STORAGE_START_ADDRESS, MAX_PARTIONED_SKETCH_SIZE);
+  copyFlashAndReset(SKETCH_START_ADDRESS, STORAGE_START_ADDRESS, MAX_PARTIONED_SKETCH_SIZE, PAGE_SIZE);
 }
 
 long InternalStorageClass::maxSize()

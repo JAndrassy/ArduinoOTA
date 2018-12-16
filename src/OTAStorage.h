@@ -14,19 +14,23 @@
   You should have received a copy of the GNU Lesser General Public
   License along with this library; if not, write to the Free Software
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+ WiFi101OTA version Feb 2017
+ by Sandeep Mistry (Arduino)
+ modified for ArduinoOTA Dec 2018
+ by Juraj Andrassy
 */
 
 #ifndef _OTA_STORAGE_H_INCLUDED
 #define _OTA_STORAGE_H_INCLUDED
 
-#ifdef ARDUINO_SAM_ZERO
-#define SKETCH_START_ADDRESS        (0x4000)
-#else
-#define SKETCH_START_ADDRESS        (0x2000)
-#endif
+#include <Arduino.h>
 
 class OTAStorage {
 public:
+
+  OTAStorage();
+
   virtual int open(int length) = 0;
   virtual size_t write(uint8_t) = 0;
   virtual void close() = 0;
@@ -34,8 +38,13 @@ public:
   virtual void apply() = 0;
 
   virtual long maxSize() {
-    return ((256 * 1024) - SKETCH_START_ADDRESS);
+    return (MAX_FLASH - SKETCH_START_ADDRESS);
   }
+
+protected:
+  const uint32_t SKETCH_START_ADDRESS;
+  const uint32_t PAGE_SIZE, PAGES, MAX_FLASH;
+
 };
 
 #endif
