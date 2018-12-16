@@ -14,22 +14,18 @@
   You should have received a copy of the GNU Lesser General Public
   License along with this library; if not, write to the Free Software
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+ WiFi101OTA version Feb 2017
+ by Sandeep Mistry (Arduino)
+ modified for ArduinoOTA Dec 2018
+ by Juraj Andrassy
 */
 
 #include <Arduino.h>
 
-#include "WiFi101OTA.h"
+#include "WiFiOTA.h"
 
-#if defined(ARDUINO_SAMD_ZERO)
-  #define BOARD "arduino_zero_edbg"
-#elif defined(ARDUINO_SAMD_MKR1000)
-  #define BOARD "mkr1000"
-#elif defined(ARDUINO_SAMD_MKRZERO)
-  #define BOARD "mkrzero"
-#else
-  #error "Unsupported board!"
-#endif
-
+#define BOARD "arduino"
 #define BOARD_LENGTH (sizeof(BOARD) - 1)
 
 static String base64Encode(const String& in)
@@ -69,29 +65,21 @@ static String base64Encode(const String& in)
 
 WiFiOTAClass::WiFiOTAClass() :
   _storage(NULL),
-  _server(65280),
-  _lastMdnsResponseTime(0)
+  localIp(0),
+  _lastMdnsResponseTime(0),
+  beforeApplyCallback(nullptr)
 {
 }
 
-void WiFiOTAClass::begin(const char* name, const char* password, OTAStorage& storage)
+void WiFiOTAClass::begin(IPAddress& localIP, const char* name, const char* password, OTAStorage& storage)
 {
+  localIp = localIP;
   _name = name;
   _expectedAuthorization = "Basic " + base64Encode("arduino:" + String(password));
   _storage = &storage;
-
-  _server.begin();
-
-  _mdnsSocket.beginMulti(IPAddress(224, 0, 0, 251), 5353);
 }
 
-void WiFiOTAClass::poll()
-{
-  pollMdns();
-  pollServer();
-}
-
-void WiFiOTAClass::pollMdns()
+void WiFiOTAClass::pollMdns(UDP &_mdnsSocket)
 {
   int packetLength = _mdnsSocket.parsePacket();
 
@@ -176,7 +164,7 @@ void WiFiOTAClass::pollMdns()
   };
 
   _mdnsSocket.write(ptrRecordStart, sizeof(ptrRecordStart));
-  _mdnsSocket.write(_name.c_str(), _name.length());
+  _mdnsSocket.write((const byte*) _name.c_str(), _name.length());
   _mdnsSocket.write(ptrRecordEnd, sizeof(ptrRecordEnd));
 
   const byte txtRecord[] = {
@@ -214,10 +202,8 @@ void WiFiOTAClass::pollMdns()
   };
 
   _mdnsSocket.write(srvRecordStart, sizeof(srvRecordStart));
-  _mdnsSocket.write(_name.c_str(), _name.length());
+  _mdnsSocket.write((const byte*) _name.c_str(), _name.length());
   _mdnsSocket.write(srvRecordEnd, sizeof(srvRecordEnd));
-
-  uint32_t localIp = WiFi.localIP();
 
   byte aRecordNameOffset = sizeof(responseHeader) +
                             sizeof(ptrRecordStart) + _name.length() + sizeof(ptrRecordEnd) + 
@@ -239,9 +225,8 @@ void WiFiOTAClass::pollMdns()
   _mdnsSocket.endPacket();
 }
 
-void WiFiOTAClass::pollServer()
+void WiFiOTAClass::pollServer(Client& client)
 {
-  WiFiClient client = _server.available();
 
   if (client) {
     String request = client.readStringUntil('\n');
@@ -297,12 +282,15 @@ void WiFiOTAClass::pollServer()
     }
 
     long read = 0;
+    byte buff[64];
 
     while (client.connected() && read < contentLength) {
       while (client.available()) {
-        read++;
-
-        _storage->write((char)client.read());
+        int l = client.read(buff, sizeof(buff));
+        for (int i = 0; i < l; i++) {
+          _storage->write(buff[i]);
+        }
+        read += l;
       }
     }
 
@@ -312,6 +300,10 @@ void WiFiOTAClass::pollServer()
       sendHttpResponse(client, 200, "OK");
 
       delay(500);
+
+      if (beforeApplyCallback) {
+        beforeApplyCallback();
+      }
 
       // apply the update
       _storage->apply();
@@ -341,6 +333,7 @@ void WiFiOTAClass::sendHttpResponse(Client& client, int code, const char* status
   client.println(status);
   client.println("Connection: close");
   client.println();
+  delay(500);
   client.stop();
 }
 
@@ -357,4 +350,3 @@ void WiFiOTAClass::flushRequestBody(Client& client, long contentLength)
   }
 }
 
-WiFiOTAClass WiFiOTA;

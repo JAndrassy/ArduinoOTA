@@ -20,7 +20,7 @@
  
 #include <SPI.h>
 #include <WiFi101.h>
-#include <WiFi101OTA.h>
+#include <ArduinoOTA.h>
 
 #include "arduino_secrets.h" 
 ///////please enter your sensitive data in the Secret tab/arduino_secrets.h
@@ -50,7 +50,7 @@ void setup() {
   }
 
   // start the WiFi OTA library with internal (flash) based storage
-  WiFiOTA.begin("Arduino", "password", InternalStorage);
+  ArduinoOTA.begin(WiFi.localIP(), "Arduino", "password", InternalStorage);
 
   // you're connected now, so print out the status:
   printWifiStatus();
@@ -58,7 +58,7 @@ void setup() {
 
 void loop() {
   // check for WiFi OTA updates
-  WiFiOTA.poll();
+  ArduinoOTA.poll();
 
   // add your normal loop code below ...
 }

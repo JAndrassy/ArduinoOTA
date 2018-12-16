@@ -22,7 +22,7 @@
 #include <SPI.h>
 #include <SD.h>
 #include <WiFi101.h>
-#include <WiFi101OTA.h>
+#include <ArduinoOTA.h>
 #include <SDU.h>
 
 #include "arduino_secrets.h" 
@@ -62,7 +62,7 @@ void setup() {
   }
 
   // start the WiFi OTA library with SD based storage
-  WiFiOTA.begin("Arduino", "password", SDStorage);
+  ArduinoOTA.begin(WiFi.localIP(), "Arduino", "password", SDStorage);
 
   // you're connected now, so print out the status:
   printWifiStatus();
@@ -70,7 +70,7 @@ void setup() {
 
 void loop() {
   // check for WiFi OTA updates
-  WiFiOTA.poll();
+  ArduinoOTA.poll();
 
   // add your normal loop code below ...
 }

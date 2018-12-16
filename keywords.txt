@@ -6,11 +6,11 @@
 # Datatypes (KEYWORD1)
 #######################################
 
-WiFi101OTA	KEYWORD1
-WiFiOTA	KEYWORD1
+ArduinoOTA	KEYWORD1
 
 InternalStorage	KEYWORD1
 SDStorage	KEYWORD1
+SerialFlashStorage	KEYWORD1
 
 #######################################
 # Methods and Functions (KEYWORD2)
