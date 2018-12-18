@@ -26,18 +26,47 @@
 #define SERIAL_FLASH_BUFFER_SIZE    64
 #define SERIAL_FLASH_CS             5
 
-class SerialFlashStorageClass : public OTAStorage {
+class SerialFlashStorageClass : public ExternalOTAStorage {
 public:
-  virtual int open(int length);
-  virtual size_t write(uint8_t);
-  virtual void close();
-  virtual void clear();
-  virtual void apply();
+
+  virtual int open(int length) {
+    if (!SerialFlash.begin(SERIAL_FLASH_CS)) {
+      return 0;
+    }
+
+    while (!SerialFlash.ready()) {}
+
+    if (SerialFlash.exists(updateFileName)) {
+      SerialFlash.remove(updateFileName);
+    }
+
+    if (SerialFlash.create(updateFileName, length)) {
+      _file = SerialFlash.open(updateFileName);
+    }
+
+    if (!_file) {
+      return 0;
+    }
+
+    return 1;
+  }
+
+  virtual size_t write(uint8_t b) {
+    while (!SerialFlash.ready()) {}
+    int ret = _file.write(&b, 1);
+    return ret;
+  }
+
+  virtual void close() {
+    _file.close();
+  }
+
+  virtual void clear() {
+    SerialFlash.remove(updateFileName);
+  }
 
 private:
   SerialFlashFile _file;
 };
-
-extern SerialFlashStorageClass SerialFlashStorage;
 
 #endif

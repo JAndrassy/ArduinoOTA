@@ -20,6 +20,16 @@
 #define _ARDUINOOTA_H_
 
 #include "WiFiOTA.h"
+#include "InternalStorage.h"
+#ifdef __SD_H__
+#include "SDStorage.h"
+SDStorageClass SDStorage;
+#endif
+#ifdef SerialFlash_h_
+#include "SerialFlashStorage.h"
+SerialFlashStorageClass SerialFlashStorage;
+#endif
+
 
 template <class NetServer, class NetClient>
 class ArduinoOTAClass : public WiFiOTAClass {

@@ -16,3 +16,6 @@ OTAStorage::OTAStorage() :
 {
 
 }
+void ExternalOTAStorage::apply() {
+  NVIC_SystemReset();
+}

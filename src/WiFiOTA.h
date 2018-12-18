@@ -31,9 +31,6 @@
 #include <Udp.h>
 
 #include "OTAStorage.h"
-#include "SDStorage.h"
-#include "InternalStorage.h"
-#include "SerialFlashStorage.h"
 
 class WiFiOTAClass {
 protected:

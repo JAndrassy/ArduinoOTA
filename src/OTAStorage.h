@@ -47,4 +47,17 @@ protected:
 
 };
 
+class ExternalOTAStorage : public OTAStorage {
+
+protected:
+  const char* updateFileName = "UPDATE.BIN";
+
+public:
+  void setUpdateFileName(const char* _updateFileName) {
+    updateFileName = _updateFileName;
+  }
+
+  virtual void apply();
+};
+
 #endif

@@ -27,18 +27,29 @@
 #define SDCARD_SS_PIN 4
 #endif
 
-class SDStorageClass : public OTAStorage {
+class SDStorageClass : public ExternalOTAStorage {
 public:
-  virtual int open(int length);
-  virtual size_t write(uint8_t);
-  virtual void close();
-  virtual void clear();
-  virtual void apply();
+
+  virtual int open(int length) {
+    _file = SD.open(updateFileName, FILE_WRITE);
+    if (!_file)
+      return 0;
+    return 1;
+  }
+
+  virtual size_t write(uint8_t b) {
+    return _file.write(b);
+  }
+  virtual void close() {
+    _file.close();
+  }
+
+  virtual void clear() {
+    SD.remove(updateFileName);
+  }
 
 private:
   File _file;
 };
-
-extern SDStorageClass SDStorage;
 
 #endif
