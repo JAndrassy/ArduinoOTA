@@ -38,13 +38,18 @@ extern "C" {
   // as they erase and copy the sketch data in flash
 
   __attribute__ ((long_call, noinline, section (".data#"))) //
-  static void waitForReady() {
+  void waitForReady() {
+#if defined(ARDUINO_ARCH_SAMD)
     while (!NVMCTRL->INTFLAG.bit.READY);
+#elif defined(ARDUINO_ARCH_NRF5)
+    while (NRF_NVMC->READY == NVMC_READY_READY_Busy);
+#endif
   }
 
   __attribute__ ((long_call, noinline, section (".data#")))
   static void eraseFlash(int address, int length, int pageSize)
   {
+#if defined(ARDUINO_ARCH_SAMD)
     int rowSize = pageSize * 4;
     for (int i = 0; i < length; i += rowSize) {
       NVMCTRL->ADDR.reg = ((uint32_t)(address + i)) / 2;
@@ -52,6 +57,23 @@ extern "C" {
       
       waitForReady();
     }
+#elif defined(ARDUINO_ARCH_NRF5)
+    // Enable erasing flash
+    NRF_NVMC->CONFIG = NVMC_CONFIG_WEN_Een << NVMC_CONFIG_WEN_Pos;
+
+    // Erase page(s)
+    int end_address = address + length;
+    while (address < end_address) {
+      waitForReady();
+      // Erase one 1k/4k page
+      NRF_NVMC->ERASEPAGE = address;
+      address = address + pageSize;
+    }
+    // Disable erasing, enable write
+    waitForReady();
+    NRF_NVMC->CONFIG = NVMC_CONFIG_WEN_Wen << NVMC_CONFIG_WEN_Pos;
+    waitForReady();
+#endif    
   }
 
   __attribute__ ((long_call, noinline, section (".data#")))
@@ -78,8 +100,10 @@ int InternalStorageClass::open(int length)
   _writeIndex = 0;
   _writeAddress = (uint32_t*)STORAGE_START_ADDRESS;
 
+#ifdef ARDUINO_ARCH_SAMD
   // enable auto page writes
   NVMCTRL->CTRLB.bit.MANW = 0;
+#endif
 
   eraseFlash(STORAGE_START_ADDRESS, MAX_PARTIONED_SKETCH_SIZE, PAGE_SIZE);
 
