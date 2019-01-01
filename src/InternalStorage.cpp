@@ -21,6 +21,8 @@
  by Juraj Andrassy
 */
 
+#ifndef __AVR__
+
 #include <Arduino.h>
 
 #include "InternalStorage.h"
@@ -153,3 +155,5 @@ long InternalStorageClass::maxSize()
 }
 
 InternalStorageClass InternalStorage;
+
+#endif

@@ -38,12 +38,14 @@ public:
   virtual void apply() = 0;
 
   virtual long maxSize() {
-    return (MAX_FLASH - SKETCH_START_ADDRESS);
+    return (MAX_FLASH - SKETCH_START_ADDRESS - bootloaderSize);
   }
 
 protected:
   const uint32_t SKETCH_START_ADDRESS;
-  const uint32_t PAGE_SIZE, PAGES, MAX_FLASH;
+  const uint32_t PAGE_SIZE;
+  const uint32_t MAX_FLASH;
+  uint32_t bootloaderSize;
 
 };
 

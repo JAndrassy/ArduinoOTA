@@ -20,7 +20,13 @@
 #define _ARDUINOOTA_H_
 
 #include "WiFiOTA.h"
+#ifdef __AVR__
+#if FLASHEND >= 0xFFFF
+#include "InternalStorageAVR.h"
+#endif
+#else
 #include "InternalStorage.h"
+#endif
 #ifdef __SD_H__
 #include "SDStorage.h"
 SDStorageClass SDStorage;
@@ -73,7 +79,7 @@ public:
 
 };
 
-#if defined(ethernet_h_) // Ethernet library
+#if defined(ethernet_h_) || defined(ethernet_h) // Ethernet library
 ArduinoOTAMdnsClass  <EthernetServer, EthernetClient, EthernetUDP>   ArduinoOTA;
 
 #elif defined(WiFiNINA_h) || defined(WIFI_H) // NINA and WiFi101

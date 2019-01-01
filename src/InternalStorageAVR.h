@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2017 Arduino LLC.  All right reserved.
+  Copyright (c) 2018 Juraj Andrassy
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -14,42 +14,37 @@
   You should have received a copy of the GNU Lesser General Public
   License along with this library; if not, write to the Free Software
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-*/
 
-#ifndef _SD_STORAGE_H_INCLUDED
-#define _SD_STORAGE_H_INCLUDED
+ */
 
-#include <SD.h>
+#ifndef _INTERNAL_STORAGE_AVR_H_INCLUDED
+#define _INTERNAL_STORAGE_AVR_H_INCLUDED
 
 #include "OTAStorage.h"
 
-#ifndef SDCARD_SS_PIN
-#define SDCARD_SS_PIN 4
-#endif
-
-class SDStorageClass : public ExternalOTAStorage {
+class InternalStorageAVRClass : public OTAStorage {
 public:
 
-  virtual int open(int length) {
-    _file = SD.open(updateFileName, O_CREAT | O_WRITE);
-    if (!_file)
-      return 0;
-    return 1;
-  }
+  InternalStorageAVRClass();
 
-  virtual size_t write(uint8_t b) {
-    return _file.write(b);
-  }
-  virtual void close() {
-    _file.close();
-  }
-
-  virtual void clear() {
-    SD.remove(updateFileName);
-  }
+  virtual int open(int length);
+  virtual size_t write(uint8_t);
+  virtual void close();
+  virtual void clear();
+  virtual void apply();
+  virtual long maxSize();
 
 private:
-  File _file;
+  uint32_t maxSketchSize;
+  uint32_t pageAddress;
+  uint16_t pageIndex;
+
+  union {
+    uint16_t u16;
+    uint8_t u8[2];
+  } dataWord;
 };
+
+extern InternalStorageAVRClass InternalStorage;
 
 #endif
