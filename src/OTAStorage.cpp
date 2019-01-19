@@ -2,11 +2,9 @@
 
 #if defined(ARDUINO_ARCH_SAMD)
 static const uint32_t pageSizes[] = { 8, 16, 32, 64, 128, 256, 512, 1024 };
-#ifdef ARDUINO_SAM_ZERO
-#define BOOTLOADER_SIZE        (0x4000)
-#else
-#define BOOTLOADER_SIZE        (0x2000)
-#endif
+extern "C" {
+char * __text_start__(); // 0x2000, 0x0 without bootloader and 0x4000 for M0 original bootloader
+}
 #elif defined(ARDUINO_ARCH_NRF5)
 extern "C" {
 char * __isr_vector();
@@ -19,7 +17,7 @@ char * __isr_vector();
 
 OTAStorage::OTAStorage() :
 #if defined(ARDUINO_ARCH_SAMD)
-        SKETCH_START_ADDRESS(BOOTLOADER_SIZE),
+        SKETCH_START_ADDRESS((uint32_t) __text_start__),
         PAGE_SIZE(pageSizes[NVMCTRL->PARAM.bit.PSZ]),
         MAX_FLASH(PAGE_SIZE * NVMCTRL->PARAM.bit.NVMP)
 #elif defined(ARDUINO_ARCH_NRF5)

@@ -30,9 +30,11 @@ WiFiEsp library for esp8266 with AT firmware failed tests and there is no easy f
 
 The size of networking library and SD library limit the use of ArduinoOTA library to ATmega MCUs with at least 64 kB flash memory. There are other network upload options for here excluded ATmega328p ([Ariadne bootloader](https://github.com/loathingKernel/ariadne-bootloader) for Wiznet chips, [WiFiLink firmware](https://github.com/jandrassy/arduino-firmware-wifilink) for the esp8266).
 
-The ArduinoOTA library ATmega support requires support in bootloader. For the SD storage the MCU must have a 'SD bootloader'. For the InternalStorage the bootloader must be [Optiboot with `copy_flash_pages` function](https://github.com/jandrassy/MegaCore/commit/473c6fcb0a13d2a1d0f5ba578a6ee8933086dc99).
+For upload over InternalStorage Optiboot bootloader with [`copy_flash_pages` function](https://github.com/Optiboot/optiboot/pull/269) is required. Arduino AVR package doesn't use Optiboot for Arduino Mega. For Arduino Mega you can download [my boards definitions](https://github.com/jandrassy/my_boards) and use it [to burn](https://arduino.stackexchange.com/questions/473/how-do-i-burn-the-bootloader) the modified Optiboot and to upload sketches to your Mega over USB and over network. 
 
-To use remote upload from IDE with SDStorage or InternalStorage, you must [add some lines to platform.txt file](https://github.com/jandrassy/MegaCore/commit/956be74efd5956fde41cae78bac90ff39e536606#diff-3fcd89411a125a3edb58066309f7357c) of your boards package. Packages are located in ~/.arduino15/packages/ on Linux and %userprofile%\AppData\Local\Arduino15\packages\ on Windows (AppData is a hidden folder).
+For SDStorage a 'SD bootloader' is required to load the uploaded file from the SD card. There is no good SD bootloader. 2boots works only with not available old types of SD cards and zevero/avr_boot doesn't yet support USB upload of sketch. The SDStorage was tested with zevero/avr_boot. The ATmega_SD example shows how to use this ArduinoOTA library with SD bootloader.
+
+To use remote upload from IDE with SDStorage or InternalStorage, you must add some lines to platform.txt file of the boards package. Packages are located in ~/.arduino15/packages/ on Linux and %userprofile%\AppData\Local\Arduino15\packages\ on Windows (AppData is a hidden folder).
 
 The upload over ArduinoOTA library requires upload of .bin file. To set Arduino IDE to create a .bin file add following lines after existing similar lines:
 
@@ -49,12 +51,6 @@ tools.avrdude.upload.network_pattern="{network_cmd}" -address {serial.port} -por
 ```
 
 The Arduino AVR core has this lines but the tools.avrdude.upload.network_pattern is different (for Yun). Change it to this version. The upload tool is installed with Arduino AVR core package. At least version 1.2 of the arduinoOTA tool is required.
-
-For SDStorage a 'SD bootloader' is required to load the uploaded file from the SD card. There is no good SD bootloader. 2boots works only with not available old types of SD cards and zevero/avr_boot doesn't yet support USB upload of sketch. The SDStorage was tested with zevero/avr_boot. The ATmega_SD example shows how to use this ArduinoOTA library with SD bootloader.
-
-For upload over InternalStorage Optiboot bootloader with 'copy_flash_pages' function is required. Core packages by MCUdude have Optiboot bootloader for all ATmega boards. 
-
-Arduino AVR package doesn't use Optiboot for Arduino Mega. For Arduino Mega install [MegaCore package](https://github.com/MCUdude/MegaCore#boards-manager-installation) and flash the [updated Optiboot bootloader](https://github.com/jandrassy/MegaCore/raw/master/avr/bootloaders/optiboot_flash/atmega2560/optiboot_flash_atmega2560_UART0_115200_16000000L.hex) by replacing the original hex in MegaCore and [using Burn Bootloader in Tools menu in IDE](https://arduino.stackexchange.com/questions/473/how-do-i-burn-the-bootloader). Use MegaCore to upload sketches to Arduino Mega with Optiboot. 
 
 ## nRF5 support
 

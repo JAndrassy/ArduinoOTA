@@ -56,6 +56,10 @@ public:
     pollServer(client);
   }
 
+  void handle() { // alias
+    poll();
+  }
+
 };
 
 template <class NetServer, class NetClient, class NetUDP>
