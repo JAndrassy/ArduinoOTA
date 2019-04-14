@@ -17,7 +17,7 @@
 
  WiFi101OTA version Feb 2017
  by Sandeep Mistry (Arduino)
- modified for ArduinoOTA Dec 2018
+ modified for ArduinoOTA Dec 2018, Apr 2019
  by Juraj Andrassy
 */
 
@@ -251,6 +251,12 @@ void WiFiOTAClass::pollServer(Client& client)
       }
     } while (header != "");
 
+    bool dataUpload = false;
+#if defined(ESP8266) || defined(ESP32)
+    if (request == "POST /data HTTP/1.1") {
+      dataUpload = true;
+    } else
+#endif
     if (request != "POST /sketch HTTP/1.1") {
       flushRequestBody(client, contentLength);
       sendHttpResponse(client, 404, "Not Found");
@@ -268,7 +274,7 @@ void WiFiOTAClass::pollServer(Client& client)
       return;
     }
 
-    if (_storage == NULL || !_storage->open(contentLength)) {
+    if (_storage == NULL || !_storage->open(contentLength, dataUpload)) {
       flushRequestBody(client, contentLength);
       sendHttpResponse(client, 500, "Internal Server Error");
       return;

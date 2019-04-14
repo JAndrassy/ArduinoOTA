@@ -1,0 +1,6 @@
+
+# This configuration file supports the general ArduinoOTA library https://github.com/jandrassy/ArduinoOTA
+
+tools.esptool.network_cmd={runtime.tools.arduinoOTA.path}/bin/arduinoOTA
+tools.esptool.upload.network_pattern="{network_cmd}" -address {serial.port} -port 65280 -username arduino -password "{network.password}" -sketch "{build.path}/{build.project_name}.bin" -upload /sketch -b
+

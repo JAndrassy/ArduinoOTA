@@ -1,4 +1,6 @@
 
+# This configuration file supports the general ArduinoOTA library https://github.com/jandrassy/ArduinoOTA
+
 ## Create output (bin file)
 recipe.objcopy.bin.pattern="{compiler.path}{compiler.elf2hex.cmd}" -O binary {compiler.elf2hex.extra_flags} "{build.path}/{build.project_name}.elf" "{build.path}/{build.project_name}.bin"
 

@@ -17,7 +17,7 @@
 
  WiFi101OTA version Feb 2017
  by Sandeep Mistry (Arduino)
- modified for ArduinoOTA Dec 2018
+ modified for ArduinoOTA Dec 2018, Apr 2019
  by Juraj Andrassy
 */
 
@@ -32,6 +32,10 @@ public:
   OTAStorage();
 
   virtual int open(int length) = 0;
+  virtual int open(int length, uint8_t command) {
+    (void) command;
+    return open(length);
+  }
   virtual size_t write(uint8_t) = 0;
   virtual void close() = 0;
   virtual void clear() = 0;

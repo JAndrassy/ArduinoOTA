@@ -21,7 +21,7 @@
  by Juraj Andrassy
 */
 
-#ifndef __AVR__
+#if !defined(__AVR__) && !defined(ESP8266) && !defined(ESP32)
 
 #include <Arduino.h>
 

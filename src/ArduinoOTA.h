@@ -24,6 +24,8 @@
 #if FLASHEND >= 0xFFFF
 #include "InternalStorageAVR.h"
 #endif
+#elif defined(ESP8266) || defined(ESP32)
+#include "InternalStorageESP.h"
 #else
 #include "InternalStorage.h"
 #endif
@@ -73,7 +75,11 @@ public:
 
   void begin(IPAddress localIP, const char* name, const char* password, OTAStorage& storage) {
     ArduinoOTAClass<NetServer, NetClient>::begin(localIP, name, password, storage);
+#if defined(ESP8266) && !(defined(ethernet_h_) || defined(ethernet_h) || defined(UIPETHERNET_H))
+    mdnsSocket.beginMulticast(localIP, IPAddress(224, 0, 0, 251), 5353);
+#else
     mdnsSocket.beginMulticast(IPAddress(224, 0, 0, 251), 5353);
+#endif
   }
 
   void poll() {
@@ -86,7 +92,10 @@ public:
 #if defined(ethernet_h_) || defined(ethernet_h) // Ethernet library
 ArduinoOTAMdnsClass  <EthernetServer, EthernetClient, EthernetUDP>   ArduinoOTA;
 
-#elif defined(WiFiNINA_h) || defined(WIFI_H) // NINA and WiFi101
+#elif defined(UIPETHERNET_H) // no UDP multicast implementation yet
+ArduinoOTAClass  <EthernetServer, EthernetClient>   ArduinoOTA;
+
+#elif defined(WiFiNINA_h) || defined(WIFI_H) || defined(ESP8266) || defined(ESP32) // NINA, WiFi101 and Espressif WiFi
 #include <WiFiUdp.h>
 ArduinoOTAMdnsClass <WiFiServer, WiFiClient, WiFiUDP> ArduinoOTA;
 
@@ -96,12 +105,8 @@ ArduinoOTAClass  <WiFiServer, WiFiClient> ArduinoOTA;
 #elif defined(_WIFISPI_H_INCLUDED) // no UDP multicast implementation
 ArduinoOTAClass  <WiFiSpiServer, WiFiSpiClient> ArduinoOTA;
 
-#elif defined(UIPETHERNET_H) // no UDP multicast implementation
-ArduinoOTAClass  <EthernetServer, EthernetClient>   ArduinoOTA;
-
 #else
 #error "Network library not included or not supported"
 #endif
 
 #endif
-
