@@ -47,7 +47,9 @@ The size of networking library and SD library limit the use of ArduinoOTA librar
 
 *There are other network upload options for here excluded ATmega328p: ([Ariadne bootloader](https://github.com/loathingKernel/ariadne-bootloader) for Wiznet chips, [WiFiLink firmware](https://github.com/jandrassy/arduino-firmware-wifilink) for the esp8266).*
 
-For upload over InternalStorage, Optiboot bootloader with [`copy_flash_pages` function](https://github.com/Optiboot/optiboot/pull/269) is required. Arduino AVR package doesn't use Optiboot for Arduino Mega. For Arduino Mega you can download [my boards definitions](https://github.com/jandrassy/my_boards) and use it [to burn](https://arduino.stackexchange.com/questions/473/how-do-i-burn-the-bootloader) the modified Optiboot and to upload sketches to your Mega over USB and over network. 
+For upload over InternalStorage, Optiboot bootloader with [`copy_flash_pages` function](https://github.com/Optiboot/optiboot/pull/269) is required. MegaCore 2.0.2 bootloader source has `copy_flash_pages` functions. (The build hex files do not contain it.) 
+
+Most common ATmega board with more then 64 kB of flash memory is Arduino Mega. To use it with ArduinoOTA library, you can't use it  directly with the Arduino AVR package, because the package doesn't have the right fuse settings for Mega with Optiboot. You can download [my boards definitions](https://github.com/jandrassy/my_boards) and use it [to burn](https://arduino.stackexchange.com/questions/473/how-do-i-burn-the-bootloader) the modified Optiboot and to upload sketches to your Mega over USB and over network. 
 
 For SDStorage a 'SD bootloader' is required to load the uploaded file from the SD card. There is no good SD bootloader. 2boots works only with not available old types of SD cards and zevero/avr_boot doesn't yet support USB upload of sketch. The SDStorage was tested with zevero/avr_boot. The ATmega_SD example shows how to use this ArduinoOTA library with SD bootloader.
 
