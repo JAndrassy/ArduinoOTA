@@ -2,6 +2,8 @@
 
 #if defined(ARDUINO_ARCH_SAMD)
 static const uint32_t pageSizes[] = { 8, 16, 32, 64, 128, 256, 512, 1024 };
+static const uint32_t eepromSizes[] = { 16384, 8192, 4096, 2048, 1024, 512, 256, 0 };
+#define EEPROM_EMULATION_RESERVATION ((*(uint32_t*)(NVMCTRL_FUSES_EEPROM_SIZE_ADDR) & NVMCTRL_FUSES_EEPROM_SIZE_Msk) >> NVMCTRL_FUSES_EEPROM_SIZE_Pos)
 extern "C" {
 char * __text_start__(); // 0x2000, 0x0 without bootloader and 0x4000 for M0 original bootloader
 }
@@ -19,7 +21,7 @@ OTAStorage::OTAStorage() :
 #if defined(ARDUINO_ARCH_SAMD)
         SKETCH_START_ADDRESS((uint32_t) __text_start__),
         PAGE_SIZE(pageSizes[NVMCTRL->PARAM.bit.PSZ]),
-        MAX_FLASH(PAGE_SIZE * NVMCTRL->PARAM.bit.NVMP)
+        MAX_FLASH(PAGE_SIZE * NVMCTRL->PARAM.bit.NVMP - eepromSizes[EEPROM_EMULATION_RESERVATION])
 #elif defined(ARDUINO_ARCH_NRF5)
         SKETCH_START_ADDRESS((uint32_t) __isr_vector),
         PAGE_SIZE((size_t) NRF_FICR->CODEPAGESIZE),
