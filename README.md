@@ -10,30 +10,29 @@ The library is a modification of the Arduino WiFi101OTA library.
 ## Supported micro-controllers
 
 * ATmega AVR with at least 64 kB of flash (Arduino Mega, [MegaCore](https://github.com/MCUdude/MegaCore) MCUs, MightyCore 1284p and 644)
-* Arduino SAMD boards like Zero, M0 or MKR 
+* Arduino SAMD boards like Zero, M0 or MKR and the new "Nano 33 IoT" 
 * nRF5 board supported by [nRF5 core](https://github.com/sandeepmistry/arduino-nRF5).
 * boards supported by ESP8266 and ESP32 Arduino boards package  
 
 ## Supported networking libraries
 
-* Ethernet library - shields and modules with Wiznet 5100, 5200 and 5500 chips
+* Ethernet library - Ethernet shields and modules with Wiznet 5100, 5200 and 5500 chips
 * WiFi101 - WiFi101 shield and MKR 1000
-* WiFiNINA - MKR 1010, MKR 4000, ESP32 as SPI network adapter with WiFiNINA firmware
+* WiFiNINA - MKR 1010, MKR 4000, Nano 33 IoT and any supported MCU with attached ESP32 as SPI network adapter with WiFiNINA firmware
+* WiFiEspAT - esp8266 as network adapter with AT firmware
 * WiFiLink - esp8266 as network adapter with WiFiLink firmware (SPI or Serial)
 * UIPEthernet - shields and modules with ENC28j60 chip
 * WiFiSpi - esp8266 as SPI network adapter with WiFiSpi library updated with [this PR](https://github.com/JiriBilek/WiFiSpi/pull/12)
 * WiFi - Arduino WiFi Shield (not tested)
 * WiFi library of ESP8266 and ESP32 Arduino boards package
 
-UIPEthernet, WiFiSpi and WiFi library don't support UDP multicast for MDNS, so Arduino IDE will not show the network upload port. WiFiLink doesn't support UDP multicast, but the firmware propagates the MDNS record.
-
-WiFiEsp library for esp8266 with AT firmware failed tests and there is no easy fix. 
+UIPEthernet, WiFiSpi and WiFi library don't support UDP multicast for MDNS, so Arduino IDE will not show the network upload port. WiFiEspAT and WiFiLink doesn't support UDP multicast, but the firmware propagates the MDNS record.
 
 ## Installation
 
 The library is in Library Manager of the Arduino IDE.
 
-Arduino SAMD boards (Zero, M0, MKR) are supported 'out of the box'.
+Arduino SAMD boards (Zero, M0, MKR, Nano 33 IoT) are supported 'out of the box'.
 
 For nRF5 boards two lines need to be added to platform.txt file of the nRF5 Arduino package (until the PR that adds them is accepted and included in a release). Only nRF51 was tested until now. For details scroll down.
 
