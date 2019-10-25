@@ -57,6 +57,17 @@ public:
 #endif
   }
 
+  void end() {
+#if defined(ESP8266) || defined(ESP32)
+    server.stop();
+#elif defined(_WIFI_ESP_AT_H_)
+    server.end();
+    //TODO WiFi.stopMDNS();
+#else
+//#warning "The networking library doesn't have a function to stop the server"
+#endif
+  }
+
   void poll() {
     NetClient client = server.available();
     pollServer(client);
@@ -84,6 +95,11 @@ public:
 #else
     mdnsSocket.beginMulticast(IPAddress(224, 0, 0, 251), 5353);
 #endif
+  }
+
+  void end() {
+    ArduinoOTAClass<NetServer, NetClient>::end();
+    mdnsSocket.stop();
   }
 
   void poll() {
