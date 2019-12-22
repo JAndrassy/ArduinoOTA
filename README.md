@@ -26,7 +26,7 @@ The library is a modification of the Arduino WiFi101OTA library.
 * WiFi - Arduino WiFi Shield (not tested)
 * WiFi library of ESP8266 and ESP32 Arduino boards package
 
-UIPEthernet, WiFiSpi and WiFi library don't support UDP multicast for MDNS, so Arduino IDE will not show the network upload port. WiFiEspAT and WiFiLink doesn't support UDP multicast, but the firmware propagates the MDNS record.
+UIPEthernet, WiFiEspAT, WiFiSpi and WiFi library don't support UDP multicast for MDNS, so Arduino IDE will not show the network upload port. WiFiLink doesn't support UDP multicast, but the firmware propagates the MDNS record.
 
 ## Installation
 

@@ -52,9 +52,6 @@ public:
   void begin(IPAddress localIP, const char* name, const char* password, OTAStorage& storage) {
     WiFiOTAClass::begin(localIP, name, password, storage);
     server.begin();
-#ifdef _WIFI_ESP_AT_H_
-    WiFi.startMDNS(name, "arduino", OTA_PORT);
-#endif
   }
 
   void end() {
@@ -62,7 +59,6 @@ public:
     server.stop();
 #elif defined(_WIFI_ESP_AT_H_)
     server.end();
-    //TODO WiFi.stopMDNS();
 #else
 //#warning "The networking library doesn't have a function to stop the server"
 #endif
@@ -119,8 +115,7 @@ ArduinoOTAClass  <EthernetServer, EthernetClient>   ArduinoOTA;
 #include <WiFiUdp.h>
 ArduinoOTAMdnsClass <WiFiServer, WiFiClient, WiFiUDP> ArduinoOTA;
 
-#elif defined(WiFi_h) || defined(_WIFI_ESP_AT_H_) // WiFi, WiFiLink and WiFiEspAT lib (no UDP multicast)
-// for WiFiLink and WiFiEspAT the firmware handles mdns
+#elif defined(WiFi_h) || defined(_WIFI_ESP_AT_H_) // WiFi, WiFiLink and WiFiEspAT lib (no UDP multicast) for WiFiLink the firmware handles mdns
 ArduinoOTAClass  <WiFiServer, WiFiClient> ArduinoOTA;
 
 #elif defined(_WIFISPI_H_INCLUDED) // no UDP multicast implementation
