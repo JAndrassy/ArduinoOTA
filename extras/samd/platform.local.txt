@@ -1,0 +1,8 @@
+
+# This configuration file supports the general ArduinoOTA library https://github.com/jandrassy/ArduinoOTA
+
+## arduinoOTA as programmer. add entries with {ip} into programmers.txt
+tools.arduinoOTA.cmd={runtime.tools.arduinoOTA.path}/bin/arduinoOTA
+tools.arduinoOTA.program.params.verbose=
+tools.arduinoOTA.program.params.quiet=
+tools.arduinoOTA.program.pattern="{cmd}" -address {ip} -port 65280 -username arduino -password password -sketch "{build.path}/{build.project_name}.bin" -upload /sketch -b

@@ -40,6 +40,23 @@ For ESP8266 and ESP32 boards, platform.local.txt from extras folder need to be c
 
 ATmega boards require to flash a modified Optiboot bootloader for flash write operations. Details are below.
 
+## OTA Upload from IDE without 'network port'
+
+Some of the supported networking libraries don't have the UDP.beginMulticast function and can't start a MDNS service to propagate the network port for Arduino IDE. And sometimes the MDNS port is not detected for the good libraries too. Arduino IDE doesn't yet allow to enter the IP address. 
+
+The workaround is to configure a fake programmer for Arduino OTA. You can use [my_boards](https://github.com/jandrassy/my_boards) as starting point. For Arduino Mega it is the best option for all ArduinoOTA aspects, for other boards it gives you control about your custom settings. In your copy of my_boards in programmers.txt, configure the IP address and restart the IDE. Note: the esp boards packages can't be used as referenced packages in my_boards style.
+
+If you don't want to use my_boards, the platform.local.txt files for avr and samd in extras folder in this library contain the configuration for arduinoOTA tool as programmer. Copy platform.local.txt next to platform.txt in the hardware package of your board. The programmers.txt file can't have a 'local' extension so you have to add your OTA 'programmer' configuration into the existing programmers.txt file. Then restart the IDE.
+
+Example OTA 'programmer' configuration in programmers.txt:
+```
+arduinoOTA104.name=Arduino OTA (192.168.1.104)
+arduinoOTA104.program.tool=arduinoOTA
+arduinoOTA104.ip=192.168.1.104
+``` 
+
+In IDE select in Tools menu the "Arduino OTA (...)" programmer and use "Upload using programmer" from the Sketch menu in IDE.
+
 ## ATmega support
 
 The size of networking library and SD library limit the use of ArduinoOTA library to ATmega MCUs with at least 64 kB flash memory. 
