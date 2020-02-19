@@ -57,6 +57,12 @@ arduinoOTA104.ip=192.168.1.104
 
 In IDE select in Tools menu the "Arduino OTA (...)" programmer and use "Upload using programmer" from the Sketch menu in IDE.
 
+## OTA update as download
+
+The WiFi101OTA and ArduinoOTA libraries were created for upload from IDE. But in some scenarios as for example deployed sleeping battery powered devices it is better to have the update available for download by the device.
+
+In advanced section of examples you can find examples of sketch update over download from a http server. One example shows update over the InternalStorage object of the ArduinoOTA library. The example for update over SD card doesn't use this library at all.    
+
 ## ATmega support
 
 The size of networking library and SD library limit the use of ArduinoOTA library to ATmega MCUs with at least 64 kB flash memory. 
@@ -78,8 +84,6 @@ The IDE upload tool is installed with Arduino AVR core package. At least version
 The ArduinoOTA library bundled with ESP8266 and ESP32 Arduino packages works only with native WiFi libraries. This library allows to upload a sketch to esp8266 or esp32 over Ethernet with Ethernet or UIPEthernet library. Upload over the native WiFi library works too.
 
 To use this library instead of the bundled library, the bundled library must be removed from the boards package library folder. To override the configuration of OTA upload in platform.txt, copy the platform.local.txt file from extras folder of this library next to platform.txt file in boards package installation folder. Packages are located in ~/.arduino15/packages/ on Linux and %userprofile%\AppData\Local\Arduino15\packages\ on Windows (AppData is a hidden folder).
-
-The esp8266 boards package has bundled Ethernet library. It is an old version of the Arduino Ethernet library which works only with W5100 chips. It is better to remove it from boards package and install the Ethernet library from Library Manager in IDE.
 
 This library supports SPIFFS upload to esp8266 and esp32, but the IDE plugins have the network upload tool hardcoded to espota. It can't be changed in configuration. To upload SPIFFS, call the plugin in Tools menu and after it fails to upload over network, go to location of the created bin file and upload the file with arduinoOTA tool from command line. The location of the file is printed in the IDE console window. Upload command example (linux):
 ```
