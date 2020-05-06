@@ -45,6 +45,8 @@ extern "C" {
     while (!NVMCTRL->INTFLAG.bit.READY);
 #elif defined(ARDUINO_ARCH_NRF5)
     while (NRF_NVMC->READY == NVMC_READY_READY_Busy);
+#elif defined(__SAM3X8E__)
+/////////// while ...    
 #endif
   }
 
@@ -75,6 +77,8 @@ extern "C" {
     waitForReady();
     NRF_NVMC->CONFIG = NVMC_CONFIG_WEN_Wen << NVMC_CONFIG_WEN_Pos;
     waitForReady();
+#elif defined(__SAM3X8E__)
+/////////////////    
 #endif    
   }
 
