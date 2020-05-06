@@ -26,6 +26,11 @@
 
 #include "InternalStorageESP.h"
 
+#ifndef U_SPIFFS
+// Needed for backwards compatibility: https://github.com/esp8266/Arduino/commit/a389a995fb12459819e33970ec80695f1eaecc58
+#define U_SPIFFS U_FS
+#endif
+
 InternalStorageESPClass::InternalStorageESPClass()
 {
 }
