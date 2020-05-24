@@ -27,12 +27,29 @@
 
 #include "InternalStorage.h"
 
+#if defined(__SAM3X8E__)
+#include "flash_efc.h"
+#include "efc.h"
+#endif
+
+
 InternalStorageClass::InternalStorageClass() :
+
+#if defined(__SAM3X8E__)
+  MAX_PARTIONED_SKETCH_SIZE(256*1024),
+  STORAGE_START_ADDRESS(IFLASH1_ADDR)
+#else
   MAX_PARTIONED_SKETCH_SIZE((MAX_FLASH - SKETCH_START_ADDRESS) / 2),
   STORAGE_START_ADDRESS(SKETCH_START_ADDRESS + MAX_PARTIONED_SKETCH_SIZE)
+#endif
 {
   _writeIndex = 0;
   _writeAddress = nullptr;
+
+#if defined(__SAM3X8E__)
+  flash_init(FLASH_ACCESS_MODE_128, 6);
+  //if (retCode != FLASH_RC_OK)
+#endif
 }
 
 extern "C" {
@@ -106,12 +123,23 @@ int InternalStorageClass::open(int length)
   _writeIndex = 0;
   _writeAddress = (uint32_t*)STORAGE_START_ADDRESS;
 
+Serial.println("Open flash for write\n");
+
 #ifdef ARDUINO_ARCH_SAMD
   // enable auto page writes
   NVMCTRL->CTRLB.bit.MANW = 0;
 #endif
 
+#if defined(__SAM3X8E__)
+ int retCode = flash_unlock((uint32_t)STORAGE_START_ADDRESS, (uint32_t) MAX_PARTIONED_SKETCH_SIZE, 0, 0);
+  if (retCode != FLASH_RC_OK) {
+    Serial.println("Failed to unlock flash for write\n");
+    }
+#else
   eraseFlash(STORAGE_START_ADDRESS, MAX_PARTIONED_SKETCH_SIZE, PAGE_SIZE);
+#endif
+
+
 
   return 1;
 }
@@ -124,11 +152,19 @@ size_t InternalStorageClass::write(uint8_t b)
   if (_writeIndex == 4) {
     _writeIndex = 0;
 
-    *_writeAddress = _addressData.u32;
+#if defined(__SAM3X8E__)
+    int retCode = flash_write((uint32_t) _writeAddress, &_addressData.u32, 4, 1);
+    if (retCode != FLASH_RC_OK) 
+		Serial.println("Flash write failed\n");
 
     _writeAddress++;
 
+#else
+    *_writeAddress = _addressData.u32;
+    _writeAddress++;
     waitForReady();
+#endif
+
   }
 
   return 1;
@@ -136,21 +172,52 @@ size_t InternalStorageClass::write(uint8_t b)
 
 void InternalStorageClass::close()
 {
+Serial.println("Closing flash\n");
+
   while ((int)_writeAddress % PAGE_SIZE) {
     write(0xff);
-  }
+  }  
+#if defined(__SAM3X8E__)
+  int retCode = flash_lock((uint32_t)STORAGE_START_ADDRESS, (uint32_t) MAX_PARTIONED_SKETCH_SIZE, 0, 0);
+  if (retCode != FLASH_RC_OK) 
+    Serial.println("Failed to lock flash for write\n");
+#endif  
+  
 }
 
 void InternalStorageClass::clear()
 {
 }
 
+
 void InternalStorageClass::apply()
 {
+#if defined(__SAM3X8E__)
+if (flash_is_gpnvm_set(2)) // BANK1 is active
+{
+Serial.println("Switching to BANK0");
+flash_clear_gpnvm(2);
+
+}
+
+else
+{
+Serial.println("Switching to BANK1");
+flash_set_gpnvm(2);
+}
+
+flash_set_gpnvm(1); //Booting from FLASH
+
+Serial.println("Restarting");
+delay(500);
+
+RSTC->RSTC_CR = 0xA5000005;
+#else
   // disable interrupts, as vector table will be erase during flash sequence
   noInterrupts();
 
   copyFlashAndReset(SKETCH_START_ADDRESS, STORAGE_START_ADDRESS, MAX_PARTIONED_SKETCH_SIZE, PAGE_SIZE);
+#endif
 }
 
 long InternalStorageClass::maxSize()

@@ -22,10 +22,12 @@ OTAStorage::OTAStorage() :
         SKETCH_START_ADDRESS((uint32_t) __text_start__),
         PAGE_SIZE(pageSizes[NVMCTRL->PARAM.bit.PSZ]),
         MAX_FLASH(PAGE_SIZE * NVMCTRL->PARAM.bit.NVMP - eepromSizes[EEPROM_EMULATION_RESERVATION])
+
 #elif defined(__SAM3X8E__)
-        SKETCH_START_ADDRESS((uint32_t) 0), ////
-        PAGE_SIZE(16),///
-        MAX_FLASH(1024)///
+
+        SKETCH_START_ADDRESS((uint32_t) IFLASH0_ADDR),
+        PAGE_SIZE(IFLASH0_PAGE_SIZE),
+        MAX_FLASH(256*1024)
 
 #elif defined(ARDUINO_ARCH_NRF5)
         SKETCH_START_ADDRESS((uint32_t) __isr_vector),
