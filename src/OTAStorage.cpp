@@ -26,7 +26,7 @@ OTAStorage::OTAStorage() :
 #elif defined(__SAM3X8E__)
 
         SKETCH_START_ADDRESS((uint32_t) IFLASH0_ADDR),
-        PAGE_SIZE(IFLASH0_PAGE_SIZE),
+        PAGE_SIZE(256),
         MAX_FLASH(256*1024)
 
 #elif defined(ARDUINO_ARCH_NRF5)

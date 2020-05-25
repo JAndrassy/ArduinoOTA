@@ -41,13 +41,21 @@ public:
 private:
   const uint32_t MAX_PARTIONED_SKETCH_SIZE, STORAGE_START_ADDRESS;
 
-  union {
+
+#if defined(__SAM3X8E__)
+  union addressData {
+    uint32_t u32;
+    uint8_t u8[256];
+  } _addressData;
+#else
+  union addressData{
     uint32_t u32;
     uint8_t u8[4];
   } _addressData;
+#endif
 
   int _writeIndex;
-  uint32_t* _writeAddress;
+  addressData * _writeAddress;
 };
 
 extern InternalStorageClass InternalStorage;
