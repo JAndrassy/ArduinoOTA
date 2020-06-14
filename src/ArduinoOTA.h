@@ -44,23 +44,19 @@ template <class NetServer, class NetClient>
 class ArduinoOTAClass : public WiFiOTAClass {
 
 private:
-//  bool init;
   NetServer server;
 
 public:
   ArduinoOTAClass() : server(OTA_PORT) 
 	    {
-	    //init=false;
 	    };
 
   void begin(IPAddress localIP, const char* name, const char* password, OTAStorage& storage) {
     WiFiOTAClass::begin(localIP, name, password, storage);
     server.begin();
-    //init=true;
   }
 
   void end() {
-  //init=false;
 #if defined(ESP8266) || defined(ESP32)
     server.stop();
 #elif defined(_WIFI_ESP_AT_H_)
@@ -71,12 +67,8 @@ public:
   }
 
   void poll() {
-  //if (init)
-  //{
     NetClient client = server.available();
     pollServer(client);
- //    }
- // else Serial.write(".");    
   }
 
   void handle() { // alias

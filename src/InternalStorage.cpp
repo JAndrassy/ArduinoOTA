@@ -35,20 +35,14 @@
 
 InternalStorageClass::InternalStorageClass() :
 
-#if defined(__SAM3X8E__)
-  MAX_PARTIONED_SKETCH_SIZE(256*1024),
-  STORAGE_START_ADDRESS(IFLASH1_ADDR)
-#else
   MAX_PARTIONED_SKETCH_SIZE((MAX_FLASH - SKETCH_START_ADDRESS) / 2),
   STORAGE_START_ADDRESS(SKETCH_START_ADDRESS + MAX_PARTIONED_SKETCH_SIZE)
-#endif
-{
+{ 
   _writeIndex = 0;
   _writeAddress = nullptr;
-
+  _sketchSize = 0;
 #if defined(__SAM3X8E__)
   flash_init(FLASH_ACCESS_MODE_128, 6);
-  //if (retCode != FLASH_RC_OK)
 #endif
 }
 
@@ -102,23 +96,38 @@ extern "C" {
 #endif    
   }
 
-  __attribute__ ((long_call, noinline, section (".data#")))
-  static void copyFlashAndReset(int dest, int src, int length, int pageSize)
-  {
 
+    
 #if defined(__SAM3X8E__)
-flash_set_gpnvm(1); //Booting from FLASH
+#define  us_num_pages_in_region  (IFLASH0_LOCK_REGION_SIZE / IFLASH0_PAGE_SIZE)
+#define RAMFUNC __attribute__ ((section(".ramfunc")))
 
+extern  void copyFlashAndReset(int dest, int src, int length, int pageSize);
+RAMFUNC void copyFlashAndReset(int dest, int src, int length, int pageSize)
+
+{
+static uint32_t(*iap_perform_command) (uint32_t, uint32_t);
+uint32_t ul_efc_nb;
+/* Use IAP function with 2 parameters in ROM. */
+iap_perform_command = (uint32_t(*)(uint32_t, uint32_t)) *((uint32_t *) CHIP_FLASH_IAP_ADDRESS);
+ul_efc_nb = 0;
+
+
+
+//Bank swithch forction  not working on SAM with firmware>64K - see Errata
 /*
-HMM not working - starting & hung
 // Not actual copy, just switch banks
+
+flash_set_gpnvm(1); //Booting from FLASH
 
 if (FLASH_RC_YES == flash_is_gpnvm_set(2)) // BANK1 is active
 {
 Serial.println("Switching to BANK0");
 delay(500);
 noInterrupts();
-flash_clear_gpnvm(2);
+//flash_clear_gpnvm(2);
+iap_perform_command(ul_efc_nb,    EEFC_FCR_FKEY(0x5Au) | EEFC_FCR_FARG(2) |
+				  EEFC_FCR_FCMD(EFC_FCMD_CGPB));
 }
 
 else
@@ -126,48 +135,109 @@ else
 Serial.println("Switching to BANK1");
 delay(500);
 noInterrupts();
-flash_set_gpnvm(2);
+//flash_set_gpnvm(2);
+iap_perform_command(ul_efc_nb,    EEFC_FCR_FKEY(0x5Au) | EEFC_FCR_FARG(2) |
+				  EEFC_FCR_FCMD(EFC_FCMD_SGPB));
 }
-*/
 
+RSTC->RSTC_CR = 0xA5000005;
+*/
 // Since bank swithing is not working - just copy to bank0 from bank1
-int retCode = flash_unlock((uint32_t)dest, (uint32_t) src-1, 0, 0);
-  if (retCode != FLASH_RC_OK) {
-    Serial.println("Failed to unlock bank0 for write\n");
-    }
  
+Efc *p_efc;
+uint16_t us_page;
+uint32_t *p_src;
+uint32_t *p_dest;
+int32_t  left;
+
+
 Serial.print("Flashing bytes:");
 Serial.println(length);
+Serial.print("From:");
+Serial.println(src,HEX);
+Serial.print("To:");
+Serial.println(dest,HEX);
+Serial.print("PageSize:");
+Serial.println(pageSize);
+
+
 delay(300);
+watchdogReset();
+
+
+flash_set_gpnvm(1); //Booting from FLASH
+
+// Preparing to flashing
+
+p_efc = EFC0;
+us_page = 0;
+
+efc_set_wait_state(p_efc, 6);
+p_dest = (uint32_t *) dest;
+p_src = (uint32_t *) src;
+left = length;
 
 noInterrupts();
 
-//NOt working
-//eraseFlash(dest, length, pageSize);
-//flash_erase_all(dest); 
-
-while (length>=256)
+while (left>0)
     {
-    flash_write(dest,(void*) src,256,1);
-    dest+=256;
-    src+=256;
-    length-=256;
-    watchdogReset();
+    // Dangerous zone - no exterlal flash based routines allowed below
+
+                // Unlock range     
+		if (! (us_page % us_num_pages_in_region))
+				      iap_perform_command(ul_efc_nb,
+						EEFC_FCR_FKEY(0x5Au) | EEFC_FCR_FARG(us_page) |
+						EEFC_FCR_FCMD(EFC_FCMD_CLB));
+
+		// Copy page
+		for (int ul_idx = 0; ul_idx < (IFLASH0_PAGE_SIZE / sizeof(uint32_t)); ++ul_idx) 
+		                          {
+					    *p_dest++ = *p_src++;
+					  }
+
+               
+                if ((us_page+1) % us_num_pages_in_region)
+	 
+		// Erase & write page		
+		    iap_perform_command(ul_efc_nb,
+			EEFC_FCR_FKEY(0x5Au) | EEFC_FCR_FARG(us_page) |
+			EEFC_FCR_FCMD(EFC_FCMD_EWP));
+			//	result at  (p_efc->EEFC_FSR & EEFC_ERROR_FLAGS);
+		
+		else // last page in the lock region
+		// Erase, write, lock	page		
+		   iap_perform_command(ul_efc_nb,
+			EEFC_FCR_FKEY(0x5Au) | EEFC_FCR_FARG(us_page) |
+			EEFC_FCR_FCMD(EFC_FCMD_EWPL));
+			//	result at  (p_efc->EEFC_FSR & EEFC_ERROR_FLAGS);
+
+
+
+
+    us_page++;
+    left -= IFLASH0_PAGE_SIZE;
+    //watchdogReset();
+
     }
-flash_write(dest,(void*) src,length,1);
+// End low-level flashing code    
+    
 
-// Locking flash
-retCode = flash_lock((uint32_t)dest, (uint32_t) src-1, 0, 0);
- 
-//Todo - clean STORAGE (not working)
-//flash_erase_all(src); 
 
+//Restart
 RSTC->RSTC_CR = 0xA5000005;
 
+}
+
+
 #else
+
+  __attribute__ ((long_call, noinline, section (".data#")))
+  static void copyFlashAndReset(int dest, int src, int length, int pageSize)
+  {
     uint32_t* d = (uint32_t*)dest;
     uint32_t* s = (uint32_t*)src;
-    
+
+  // disable interrupts, as vector table will be erase during flash sequence    
     noInterrupts();
 
     eraseFlash(dest, length, pageSize);
@@ -177,10 +247,14 @@ RSTC->RSTC_CR = 0xA5000005;
     
       waitForReady();
     }
-#endif
+
     NVIC_SystemReset();
-  }
 }
+
+#endif
+
+} //extern C
+
 
 int InternalStorageClass::open(int length)
 {
@@ -212,51 +286,53 @@ eraseFlash(STORAGE_START_ADDRESS, MAX_PARTIONED_SKETCH_SIZE, PAGE_SIZE);
 
 size_t InternalStorageClass::write(uint8_t b)
 {
-  _addressData.u8[_writeIndex] = b;
-  _writeIndex++;
-
-  if (_writeIndex == sizeof(addressData)) {
-    _writeIndex = 0;
-
+ 
 #if defined(__SAM3X8E__)
+     _addressData[_writeIndex] = b;
+     _writeIndex++;
+
+  if ( _writeIndex == IFLASH0_PAGE_SIZE ) {
+    _writeIndex = 0;
+    
     watchdogReset();
     Serial.print("=");
-    int retCode = flash_write((uint32_t) _writeAddress, &_addressData.u32, sizeof(addressData), 1);
+    int retCode = flash_write((uint32_t) _writeAddress, &_addressData, IFLASH0_PAGE_SIZE, 0); //1?
     if (retCode != FLASH_RC_OK) 
 		{
 		Serial.println("Flash write failed\n");
                 return 0;
                 }
     _writeAddress++;
-
+   }
 #else
-    _writeAddress->u32 = _addressData.u32;
-    _writeAddress++;
-    waitForReady();
+     _addressData.u8[_writeIndex] = b;
+     _writeIndex++;
+
+  if (_writeIndex == sizeof(addressData)) {
+	    _writeIndex = 0;
+	    _writeAddress->u32 = _addressData.u32;
+	    _writeAddress++;
+	    waitForReady();
+    }
 #endif
 
-  }
-
-  return 1;
+return 1;
 }
 
-void InternalStorageClass::close()
+void InternalStorageClass::close()  
 {
+#if defined(__SAM3X8E__)
+_sketchSize = (uint32_t)_writeAddress-STORAGE_START_ADDRESS+_writeIndex;
+
+while (_writeIndex) write(0xff);  //Finish block
+
+Serial.print("\nReceived bytes:");
+Serial.println(_sketchSize);
+#else 
+
   while ((int)_writeAddress % PAGE_SIZE) {
     write(0xff); 
   }    
-#if defined(__SAM3X8E__)
-Serial.println("\nClosing flash");
-Serial.println(MAX_PARTIONED_SKETCH_SIZE = (uint32_t)_writeAddress-STORAGE_START_ADDRESS+_writeIndex);
-
-  while (_writeIndex) {
-			write(0xff);
-			}  
-
-//TODO not sure need to lock bank1 (storage)
-//  int retCode = flash_lock((uint32_t)STORAGE_START_ADDRESS, (uint32_t) STORAGE_START_ADDRESS+MAX_PARTIONED_SKETCH_SIZE-1, 0, 0);
-//  if (retCode != FLASH_RC_OK) 
-//    Serial.println("Failed to lock flash for write\n");
 #endif  
   
 }
@@ -268,9 +344,14 @@ void InternalStorageClass::clear()
 
 void InternalStorageClass::apply()
 {
-  // disable interrupts, as vector table will be erase during flash sequence
   //noInterrupts(); moved inside routine
+
+#if defined(__SAM3X8E__)
+  copyFlashAndReset(SKETCH_START_ADDRESS, STORAGE_START_ADDRESS, _sketchSize, PAGE_SIZE);
+#else
   copyFlashAndReset(SKETCH_START_ADDRESS, STORAGE_START_ADDRESS, MAX_PARTIONED_SKETCH_SIZE, PAGE_SIZE);
+#endif
+
 }
 
 long InternalStorageClass::maxSize()

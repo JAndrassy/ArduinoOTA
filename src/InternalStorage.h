@@ -39,15 +39,14 @@ public:
   virtual long maxSize();
 
 private:
-  //const
-   uint32_t MAX_PARTIONED_SKETCH_SIZE, STORAGE_START_ADDRESS;
+  const uint32_t MAX_PARTIONED_SKETCH_SIZE, STORAGE_START_ADDRESS;
+  uint32_t _sketchSize;
 
 
 #if defined(__SAM3X8E__)
-  union addressData {
-    uint32_t u32;
-    uint8_t u8[256];
-  } _addressData;
+// Buffer for page
+  typedef uint8_t addressData[256];
+  addressData _addressData; 
 #else
   union addressData{
     uint32_t u32;
