@@ -39,7 +39,8 @@ public:
   virtual long maxSize();
 
 private:
-  const uint32_t MAX_PARTIONED_SKETCH_SIZE, STORAGE_START_ADDRESS;
+  //const
+   uint32_t MAX_PARTIONED_SKETCH_SIZE, STORAGE_START_ADDRESS;
 
 
 #if defined(__SAM3X8E__)

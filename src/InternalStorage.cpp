@@ -107,12 +107,12 @@ extern "C" {
   {
 
 #if defined(__SAM3X8E__)
-// Not actual copy, just switch banks
 flash_set_gpnvm(1); //Booting from FLASH
 
 /*
-
 HMM not working - starting & hung
+// Not actual copy, just switch banks
+
 if (FLASH_RC_YES == flash_is_gpnvm_set(2)) // BANK1 is active
 {
 Serial.println("Switching to BANK0");
@@ -130,8 +130,13 @@ flash_set_gpnvm(2);
 }
 */
 
-//TODO - less bytes
-Serial.print("Copying bytes:");
+// Since bank swithing is not working - just copy to bank0 from bank1
+int retCode = flash_unlock((uint32_t)dest, (uint32_t) src-1, 0, 0);
+  if (retCode != FLASH_RC_OK) {
+    Serial.println("Failed to unlock bank0 for write\n");
+    }
+ 
+Serial.print("Flashing bytes:");
 Serial.println(length);
 delay(300);
 
@@ -151,7 +156,9 @@ while (length>=256)
     }
 flash_write(dest,(void*) src,length,1);
 
-// TODO - lock flash
+// Locking flash
+retCode = flash_lock((uint32_t)dest, (uint32_t) src-1, 0, 0);
+ 
 //Todo - clean STORAGE (not working)
 //flash_erase_all(src); 
 
@@ -189,7 +196,7 @@ Serial.println("Open flash for write\n");
 #endif
 
 #if defined(__SAM3X8E__)
-//TODO - remove
+
  int retCode = flash_unlock((uint32_t)STORAGE_START_ADDRESS, (uint32_t) STORAGE_START_ADDRESS + MAX_PARTIONED_SKETCH_SIZE - 1, 0, 0);
   if (retCode != FLASH_RC_OK) {
     Serial.println("Failed to unlock flash for write\n");
@@ -203,88 +210,6 @@ eraseFlash(STORAGE_START_ADDRESS, MAX_PARTIONED_SKETCH_SIZE, PAGE_SIZE);
 
 
 
-
-/*
-
-uint32_t flash_write(uint32_t ul_address, const void *p_buffer,
-		uint32_t ul_size, uint32_t ul_erase_flag)
-{
-	Efc *p_efc;
-	uint32_t ul_fws_temp;
-	uint16_t us_page;
-	uint16_t us_offset;
-	uint32_t writeSize;
-	uint32_t ul_page_addr;
-	uint16_t us_padding;
-	uint32_t ul_error;
-	uint32_t ul_idx;
-	uint32_t *p_aligned_dest;
-	uint8_t *puc_page_buffer = (uint8_t *) gs_ul_page_buffer;
-
-	translate_address(&p_efc, ul_address, &us_page, &us_offset);
-
-	/// According to the errata, set the wait state value to 6. 
-	ul_fws_temp = efc_get_wait_state(p_efc);
-	efc_set_wait_state(p_efc, 6);
-
-	// Write all pages 
-	while (ul_size > 0) {
-		// Copy data in temporary buffer to avoid alignment problems. 
-		writeSize = Min((uint32_t) IFLASH_PAGE_SIZE - us_offset,
-				ul_size);
-		compute_address(p_efc, us_page, 0, &ul_page_addr);
-		us_padding = IFLASH_PAGE_SIZE - us_offset - writeSize;
-
-		// Pre-buffer data 
-		memcpy(puc_page_buffer, (void *)ul_page_addr, us_offset);
-
-		// Buffer data 
-		memcpy(puc_page_buffer + us_offset, p_buffer, writeSize);
-
-		// Post-buffer data 
-		memcpy(puc_page_buffer + us_offset + 
-		writeSize,
-				(void *)(ul_page_addr + us_offset + writeSize),
-				us_padding);
-
-		// Write page.
-		//  Writing 8-bit and 16-bit data is not allowed and may lead to
-		// unpredictable data corruption.
-		//
-		p_aligned_dest = (uint32_t *) ul_page_addr;
-		for (ul_idx = 0; ul_idx < (IFLASH_PAGE_SIZE / sizeof(uint32_t));
-				++ul_idx) {
-			*p_aligned_dest++ = gs_ul_page_buffer[ul_idx];
-		}
-
-		if (ul_erase_flag) {
-			ul_error = efc_perform_command(p_efc, EFC_FCMD_EWP,
-					us_page);
-		} else {
-			ul_error = efc_perform_command(p_efc, EFC_FCMD_WP,
-					us_page);
-		}
-
-		if (ul_error) {
-			return ul_error;
-		}
-
-		// Progression 
-		p_buffer = (void *)((uint32_t) p_buffer + writeSize);
-		ul_size -= writeSize;
-		us_page++;
-		us_offset = 0;
-	}
-
-	// According to the errata, restore the wait state value. 
-	efc_set_wait_state(p_efc, ul_fws_temp);
-
-	return FLASH_RC_OK;
-}
-
-*/
-
-
 size_t InternalStorageClass::write(uint8_t b)
 {
   _addressData.u8[_writeIndex] = b;
@@ -296,7 +221,7 @@ size_t InternalStorageClass::write(uint8_t b)
 #if defined(__SAM3X8E__)
     watchdogReset();
     Serial.print("=");
-    int retCode = flash_write((uint32_t) _writeAddress, &_addressData.u32, sizeof(addressData), 0);
+    int retCode = flash_write((uint32_t) _writeAddress, &_addressData.u32, sizeof(addressData), 1);
     if (retCode != FLASH_RC_OK) 
 		{
 		Serial.println("Flash write failed\n");
@@ -322,16 +247,16 @@ void InternalStorageClass::close()
   }    
 #if defined(__SAM3X8E__)
 Serial.println("\nClosing flash");
-Serial.println((uint32_t)_writeAddress-STORAGE_START_ADDRESS+_writeIndex);
+Serial.println(MAX_PARTIONED_SKETCH_SIZE = (uint32_t)_writeAddress-STORAGE_START_ADDRESS+_writeIndex);
 
   while (_writeIndex) {
 			write(0xff);
 			}  
 
-//TODO move lock up
-  int retCode = flash_lock((uint32_t)STORAGE_START_ADDRESS, (uint32_t) STORAGE_START_ADDRESS+MAX_PARTIONED_SKETCH_SIZE-1, 0, 0);
-  if (retCode != FLASH_RC_OK) 
-    Serial.println("Failed to lock flash for write\n");
+//TODO not sure need to lock bank1 (storage)
+//  int retCode = flash_lock((uint32_t)STORAGE_START_ADDRESS, (uint32_t) STORAGE_START_ADDRESS+MAX_PARTIONED_SKETCH_SIZE-1, 0, 0);
+//  if (retCode != FLASH_RC_OK) 
+//    Serial.println("Failed to lock flash for write\n");
 #endif  
   
 }
@@ -344,7 +269,7 @@ void InternalStorageClass::clear()
 void InternalStorageClass::apply()
 {
   // disable interrupts, as vector table will be erase during flash sequence
-  //noInterrupts();
+  //noInterrupts(); moved inside routine
   copyFlashAndReset(SKETCH_START_ADDRESS, STORAGE_START_ADDRESS, MAX_PARTIONED_SKETCH_SIZE, PAGE_SIZE);
 }
 
