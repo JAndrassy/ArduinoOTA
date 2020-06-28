@@ -12,7 +12,7 @@ Hardware with optiboot bootloader
 Libs
 https://github.com/arduino-libraries/ArduinoHttpClient
 https://github.com/jandrassy/ArduinoOTA
-https://source.jananet.nl/arduino-lib/PubSubClient
+https://github.com/knolleary/pubsubclient
 
 Fill the below settings
 Upload your bin to the webserver
