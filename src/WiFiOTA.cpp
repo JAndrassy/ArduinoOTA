@@ -338,9 +338,17 @@ void WiFiOTAClass::sendHttpResponse(Client& client, int code, const char* status
   client.print(" ");
   client.println(status);
   client.println("Connection: close");
+  client.println("Content-type: text/plain");
+  client.print("Content-length: ");
+  client.println(strlen(status));
   client.println();
+  client.print(status);
   delay(500);
   client.stop();
+
+  if (code != 200 && onErrorCallback != nullptr) {
+    onErrorCallback(code, status);
+  }
 }
 
 void WiFiOTAClass::flushRequestBody(Client& client, long contentLength)

@@ -46,6 +46,10 @@ public:
     beforeApplyCallback = fn;
   }
 
+  void onError(void (*fn)(int code, const char* msg)) {
+    onErrorCallback = fn;
+  }
+
 private:
   void sendHttpResponse(Client& client, int code, const char* status);
   void flushRequestBody(Client& client, long contentLength);
@@ -59,6 +63,7 @@ private:
   uint32_t _lastMdnsResponseTime;
   
   void (*beforeApplyCallback)(void);
+  void (*onErrorCallback)(int code, const char*);
 };
 
 #endif
