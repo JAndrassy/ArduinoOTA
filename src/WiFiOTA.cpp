@@ -67,7 +67,8 @@ WiFiOTAClass::WiFiOTAClass() :
   _storage(NULL),
   localIp(0),
   _lastMdnsResponseTime(0),
-  beforeApplyCallback(nullptr)
+  beforeApplyCallback(nullptr),
+  onErrorCallback(nullptr)
 {
 }
 

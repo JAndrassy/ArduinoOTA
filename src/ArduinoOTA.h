@@ -106,14 +106,22 @@ public:
 };
 
 #if defined(ethernet_h_) || defined(ethernet_h) // Ethernet library
+#ifdef NO_OTA_PORT
+ArduinoOTAClass  <EthernetServer, EthernetClient>   ArduinoOTA;
+#else
 ArduinoOTAMdnsClass  <EthernetServer, EthernetClient, EthernetUDP>   ArduinoOTA;
+#endif
 
 #elif defined(UIPETHERNET_H) // no UDP multicast implementation yet
 ArduinoOTAClass  <EthernetServer, EthernetClient>   ArduinoOTA;
 
 #elif defined(WiFiNINA_h) || defined(WIFI_H) || defined(ESP8266) || defined(ESP32) // NINA, WiFi101 and Espressif WiFi
+#ifdef NO_OTA_PORT
+ArduinoOTAClass  <WiFiServer, WiFiClient> ArduinoOTA;
+#else
 #include <WiFiUdp.h>
 ArduinoOTAMdnsClass <WiFiServer, WiFiClient, WiFiUDP> ArduinoOTA;
+#endif
 
 #elif defined(WiFi_h) || defined(_WIFI_ESP_AT_H_) // WiFi, WiFiLink and WiFiEspAT lib (no UDP multicast) for WiFiLink the firmware handles mdns
 ArduinoOTAClass  <WiFiServer, WiFiClient> ArduinoOTA;

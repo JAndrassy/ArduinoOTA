@@ -108,6 +108,21 @@ void shutdown() {
   blePeripheral.end();
 }
 ```
+
+## Arduino 'network port'
+
+The Arduino IDE detects the Arduino 'network port' using mDNS system. This requires the use of UDP multicast. From networking libraries supported for OTA upload only Ethernet, WiFiNina, WiFi101 and the esp libraries support multicast. For this libraries ArduinoOTA.h at defaults starts the mDNS service.
+
+In some networks or on some computers UDP mDNS doesn't work. You can still use the ArduinoOTA library for upload from command line or with the fake programmer trick described elsewhere in this README.
+
+It is possible to suppress use of the mDNS service by the library. Only define NO_OTA_PORT before the include like this: 
+```
+#define NO_OTA_PORT
+#include <ArduinoOTA.h>
+```
+
+
+
 ## Boards tested
 
 * SAMD
