@@ -21,7 +21,7 @@
  by Juraj Andrassy
 */
 
-#if !defined(__AVR__) && !defined(ESP8266) && !defined(ESP32)
+#if defined(ARDUINO_ARCH_SAMD) || defined(ARDUINO_ARCH_NRF5)
 
 #include <Arduino.h>
 
@@ -33,6 +33,19 @@ InternalStorageClass::InternalStorageClass() :
 {
   _writeIndex = 0;
   _writeAddress = nullptr;
+}
+
+void InternalStorageClass::debugPrint() {
+  Serial.print("SKETCH_START_ADDRESS ");
+  Serial.println(SKETCH_START_ADDRESS);
+  Serial.print("PAGE_SIZE ");
+  Serial.println(PAGE_SIZE);
+  Serial.print("MAX_FLASH ");
+  Serial.println(MAX_FLASH);
+  Serial.print("MAX_PARTIONED_SKETCH_SIZE ");
+  Serial.println(MAX_PARTIONED_SKETCH_SIZE);
+  Serial.print("STORAGE_START_ADDRESS ");
+  Serial.println(STORAGE_START_ADDRESS);
 }
 
 extern "C" {

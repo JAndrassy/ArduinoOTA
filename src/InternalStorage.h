@@ -38,6 +38,8 @@ public:
   virtual void apply();
   virtual long maxSize();
 
+  void debugPrint();
+
 private:
   const uint32_t MAX_PARTIONED_SKETCH_SIZE, STORAGE_START_ADDRESS;
 

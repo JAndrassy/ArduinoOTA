@@ -281,7 +281,7 @@ void WiFiOTAClass::pollServer(Client& client)
       return;
     }
 
-    if (contentLength > _storage->maxSize()) {
+    if (_storage->maxSize() && contentLength > _storage->maxSize()) {
       _storage->close();
       flushRequestBody(client, contentLength);
       sendHttpResponse(client, 413, "Payload Too Large");

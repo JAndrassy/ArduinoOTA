@@ -30,7 +30,7 @@ OTAStorage::OTAStorage() :
         SKETCH_START_ADDRESS(0),
         PAGE_SIZE(SPM_PAGESIZE),
         MAX_FLASH((uint32_t) FLASHEND + 1)
-#elif defined(ESP8266) || defined(ESP32)
+#else
         SKETCH_START_ADDRESS(0), // not used
         PAGE_SIZE(0), // not used
         MAX_FLASH(0) // not used
