@@ -18,7 +18,7 @@
 
 #include <Ethernet.h>
 #include <ArduinoOTA.h>
-#include <HttpClient.h> // ArduinoHttpClient library
+#include <ArduinoHttpClient.h>
 
 const short VERSION = 1;
 

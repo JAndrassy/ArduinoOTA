@@ -16,7 +16,7 @@
  */
 
 #include <Ethernet.h>
-#include <HttpClient.h> // ArduinoHttpClient library
+#include <ArduinoHttpClient.h>
 #include <SD.h>
 #ifdef ARDUINO_ARCH_SAMD
 #include <SDU.h> // prepends to this sketch a 'second stage SD bootloader'
