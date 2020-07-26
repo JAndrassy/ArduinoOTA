@@ -130,7 +130,7 @@ ArduinoOTAClass  <WiFiServer, WiFiClient> ArduinoOTA;
 ArduinoOTAClass  <WiFiSpiServer, WiFiSpiClient> ArduinoOTA;
 
 #else
-#error "Network library not included or not supported"
+#warning "Network library not included or not supported"
 #endif
 
 #endif
