@@ -21,7 +21,7 @@
  
 #include <SPI.h>
 #include <SD.h>
-#include <WiFi101.h>
+#include <WiFiNINA.h>
 #include <ArduinoOTA.h>
 #include <SDU.h>
 

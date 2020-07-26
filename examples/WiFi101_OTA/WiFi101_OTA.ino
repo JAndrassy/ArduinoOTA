@@ -19,7 +19,7 @@
  */
  
 #include <SPI.h>
-#include <WiFi101.h>
+#include <WiFiNINA.h>
 #include <ArduinoOTA.h>
 
 #include "arduino_secrets.h" 
