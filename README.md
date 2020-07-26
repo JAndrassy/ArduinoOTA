@@ -7,6 +7,20 @@ The library is a modification of the Arduino WiFi101OTA library.
 
 ![network port in IDE](ArduinoOTA.png)
 
+## Contents
+
+* [Supported micro-controllers](#supported-micro-controllers)
+* [Supported networking libraries](#supported-networking-libraries)
+* [Installation](#installation)
+* [OTA Upload from IDE without 'network port'](#ota-upload-from-ide-without-network-port)
+* [OTA update as download](#ota-update-as-download)
+* [ATmega support](#atmega-support)
+* [ESP8266 and ESP32 support](#esp8266-and-esp32-support)
+* [nRF5 support](#nrf5-support)
+* [Arduino 'network port'](#arduino-network-port)
+* [Troubleshooting](#troubleshooting)
+* [Boards tested](#boards-tested)
+
 ## Supported micro-controllers
 
 * ATmega AVR with at least 64 kB of flash (Arduino Mega, [MegaCore](https://github.com/MCUdude/MegaCore) MCUs, MightyCore 1284p and 644)
@@ -32,7 +46,7 @@ UIPEthernet, WiFiEspAT, WiFiSpi and WiFi library don't support UDP multicast for
 
 The library is in Library Manager of the Arduino IDE.
 
-Arduino SAMD boards (Zero, M0, MKR, Nano 33 IoT) are supported 'out of the box'.
+Arduino SAMD boards (Zero, M0, MKR, Nano 33 IoT) are supported 'out of the box'. Additionally to upload over the internal flash as temporary storage, upload over SD card and over MEM shield's flash is possible. For upload over SD card use the SDU library as shown in the WiFi101_SD_OTA or similar for upload over MKR MEM shield use the SFU library.
 
 For nRF5 boards two lines need to be added to platform.txt file of the nRF5 Arduino package (until the PR that adds them is accepted and included in a release). Only nRF51 was tested until now. For details scroll down.
 
@@ -121,6 +135,41 @@ It is possible to suppress use of the mDNS service by the library. Only define N
 #include <ArduinoOTA.h>
 ```
 
+## Troubleshooting
+
+To see the details of upload command in IDE, set verbose mode for upload in IDE Preferences. arduinoOTA tool version should be 1.2 or higher.
+
+### No OTA network port in IDE tools menu
+
+Not with all supported networking libraries this library can propagate a 'network port'. See the list in 'Supported networking libraries' section of this page. 
+
+For networking libraries which support mDNS, sometimes the OS blocks or can't handle mDNS required to discover the 'network port'. Sometimes it helps to wait a little, sometimes it helps to restart the IDE, sometimes it helps disconnect and connect the network on the computer.
+
+You have still the option to use a 'fake programmer' as described in "OTA Upload from IDE without 'network port'".
+
+### arduinoOTA tool returns Unauthorized
+
+The password doesn't match. Password is the third parameter in ArduinOTA begin() in sketch.
+
+In platform.local.txt files in extras folder the password is configured as variable parameter for the normal OTA upload. The IDE asks for password and supplies the variable's value. The examples expect password "password". 
+
+platform.txt in my_boards and the fake programmer tool definition in platform.local.txt have the password set as "password" to match the examples.
+
+### arduinoOTA tool returns "Failed to reset the board, upload failed"
+
+The wrong upload command from AVR boards platform.txt is used. Did you copy `extras/avr/platform.local.txt` next to platform.txt as required?
+
+### Upload returns OK but the sketch is not replaced.
+
+The final loading of the uploaded binary is in some cases not under control of the ArduinoOTA library. 
+
+For SD card way the SD bootloader or the SDU library is responsible for loading the new binary. So SD bootloader must be present and in case of SDU, the uploaded sketch must contain the SDU library.
+
+For AVR InternalStorage upload the final loading is done by the Optiboot with `copy_flash_pages` function. Optiboot 8 without `copy_flash_pages` will successfully store the binary to upper half of the flash but will not copy it to run location in flash. 
+ 
+### Only the first OTA upload works
+
+Does the OTA uploaded sketch have ArduinoOTA?
 
 
 ## Boards tested
