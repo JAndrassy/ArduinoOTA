@@ -26,6 +26,10 @@
 
 #include "InternalStorageESP.h"
 
+#ifndef U_SPIFFS
+#define U_SPIFFS U_FS
+#endif
+
 InternalStorageESPClass::InternalStorageESPClass()
 {
 }
