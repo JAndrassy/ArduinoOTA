@@ -27,6 +27,7 @@ The library is a modification of the Arduino WiFi101OTA library.
 * Arduino SAMD boards like Zero, M0 or MKR and the new "Nano 33 IoT" 
 * nRF5 board supported by [nRF5 core](https://github.com/sandeepmistry/arduino-nRF5).
 * boards supported by ESP8266 and ESP32 Arduino boards package  
+* any board with MCU with SD bootloader
 
 ## Supported networking libraries
 
@@ -54,6 +55,8 @@ For ESP8266 and ESP32 boards, platform.local.txt from extras folder need to be c
 
 ATmega boards require to flash a modified Optiboot bootloader for flash write operations. Details are below.
 
+For other MCU upload over SD card is possible if the MCU has SD bootloader which can bootload the update bin from SD card. See the ATmega-SD example. Some MCU can use a second stage SD bootloader linked to the sketch as a library similar to SAMD package's SDU library. For upload the 'fake OTA programmer' technique can be configured.
+
 ## OTA Upload from IDE without 'network port'
 
 Some of the supported networking libraries don't have the UDP.beginMulticast function and can't start a MDNS service to propagate the network port for Arduino IDE. And sometimes the MDNS port is not detected for the good libraries too. Arduino IDE doesn't yet allow to enter the IP address. 
@@ -79,13 +82,13 @@ In advanced section of examples you can find examples of sketch update over down
 
 ## ATmega support
 
-The size of networking library and SD library limit the use of ArduinoOTA library to ATmega MCUs with at least 64 kB flash memory. 
+The sizes of networking library and the SD library allows the use of ArduinoOTA library only with ATmega MCUs with at least 64 kB flash memory. 
 
-*There are other network upload options for here excluded ATmega328p: ([Ariadne bootloader](https://github.com/loathingKernel/ariadne-bootloader) for Wiznet chips, [WiFiLink firmware](https://github.com/jandrassy/arduino-firmware-wifilink) for the esp8266).*
+*Side note: There are other network upload options for here excluded ATmega328p: ([Ariadne bootloader](https://github.com/loathingKernel/ariadne-bootloader) for Wiznet chips, [WiFiLink firmware](https://github.com/jandrassy/arduino-firmware-wifilink) for the esp8266) or [AvrDudeTelnet](https://github.com/jandrassy/lab/blob/master/AvrDudeTelnet/AvrDudeTelnet.ino) upload (Linux only).*
 
-For upload over InternalStorage, Optiboot bootloader with [`copy_flash_pages` function](https://github.com/Optiboot/optiboot/pull/269) is required. MegaCore 2.0.2 bootloader source has `copy_flash_pages` functions. (The build hex files do not contain it.) 
+For upload with ArduinoOTA library over InternalStorage, Optiboot bootloader with [`copy_flash_pages` function](https://github.com/Optiboot/optiboot/pull/269) is required. MegaCore 2.0.2 bootloader source has `copy_flash_pages` functions. (The built hex files do not contain it.) 
 
-Most common ATmega board with more then 64 kB of flash memory is Arduino Mega. To use it with ArduinoOTA library, you can't use it  directly with the Arduino AVR package, because the package doesn't have the right fuse settings for Mega with Optiboot. You can download [my boards definitions](https://github.com/jandrassy/my_boards) and use it [to burn](https://arduino.stackexchange.com/questions/473/how-do-i-burn-the-bootloader) the modified Optiboot and to upload sketches to your Mega over USB and over network. 
+The most common ATmega board with more then 64 kB of flash memory is Arduino Mega. To use it with ArduinoOTA library, you can't use it directly with the Arduino AVR package, because the package doesn't have the right fuse settings for Mega with Optiboot. You can download [my boards definitions](https://github.com/jandrassy/my_boards) and use it [to burn](https://arduino.stackexchange.com/questions/473/how-do-i-burn-the-bootloader) the modified Optiboot and to upload sketches to your Mega over USB and over network. 
 
 For SDStorage a 'SD bootloader' is required to load the uploaded file from the SD card. There is no good SD bootloader. 2boots works only with not available old types of SD cards and zevero/avr_boot doesn't yet support USB upload of sketch. The SDStorage was tested with zevero/avr_boot. The ATmega_SD example shows how to use this ArduinoOTA library with SD bootloader.
 
@@ -185,7 +188,8 @@ Does the OTA uploaded sketch have ArduinoOTA?
 * esp8266
     - Wemos D1 mini
 * esp32
-    - ESP32 Dev Module    
+    - ESP32 Dev Module
+* STM32 Blue Pill - tested only upload to SD card, without the final bootload 
 
 ## Contribution
 
