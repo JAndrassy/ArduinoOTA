@@ -1,0 +1,9 @@
+
+
+tools.openocd.network_cmd={runtime.tools.arduinoOTA.path}/bin/arduinoOTA
+tools.openocd.upload.network_pattern="{network_cmd}" -address {serial.port} -port 65280 -username arduino -password password -sketch "{build.path}/{build.project_name}.bin" -upload /sketch -b
+
+tools.arduinoOTA.cmd={runtime.tools.arduinoOTA.path}/bin/arduinoOTA
+tools.arduinoOTA.program.params.verbose=
+tools.arduinoOTA.program.params.quiet=
+tools.arduinoOTA.program.pattern="{cmd}" -address {ip} -port 65280 -username arduino -password password -sketch "{build.path}/{build.project_name}.bin" -upload /sketch -b

@@ -34,22 +34,23 @@ The library is a modification of the Arduino WiFi101OTA library.
 * Ethernet library - Ethernet shields and modules with Wiznet 5100, 5200 and 5500 chips
 * WiFi101 - WiFi101 shield and MKR 1000
 * WiFiNINA - MKR 1010, MKR 4000, Nano 33 IoT and any supported MCU with attached ESP32 as SPI network adapter with WiFiNINA firmware
-* WiFiEspAT - esp8266 as network adapter with AT firmware
+* WiFiEspAT - esp8266 or ESP32 as network adapter with AT firmware
 * WiFiLink - esp8266 as network adapter with WiFiLink firmware (SPI or Serial)
-* UIPEthernet - shields and modules with ENC28j60 chip
-* WiFiSpi - esp8266 as SPI network adapter with WiFiSpi library updated with [this PR](https://github.com/JiriBilek/WiFiSpi/pull/12)
+* EthernetENC and UIPEthernet - shields and modules with ENC28j60 chip
 * WiFi - Arduino WiFi Shield (not tested)
 * WiFi library of ESP8266 and ESP32 Arduino boards package
 
-UIPEthernet, WiFiEspAT, WiFiSpi and WiFi library don't support UDP multicast for MDNS, so Arduino IDE will not show the network upload port. WiFiLink doesn't support UDP multicast, but the firmware propagates the MDNS record.
+UIPEthernet, EthernetENC and WiFi library don't support UDP multicast for MDNS, so Arduino IDE will not show the network upload port. WiFiLink doesn't support UDP multicast, but the firmware propagates the MDNS record.
 
 ## Installation
 
 The library is in Library Manager of the Arduino IDE.
 
+Note for platformio users: Please, don't use this library with platformio. It was not tested with platformio and most of the documentation doesn't apply.  
+
 Arduino SAMD boards (Zero, M0, MKR, Nano 33 IoT) are supported 'out of the box'. Additionally to upload over the internal flash as temporary storage, upload over SD card and over MEM shield's flash is possible. For upload over SD card use the SDU library as shown in the WiFi101_SD_OTA or similar for upload over MKR MEM shield use the SFU library.
 
-For nRF5 boards two lines need to be added to platform.txt file of the nRF5 Arduino package (until the PR that adds them is accepted and included in a release). Only nRF51 was tested until now. For details scroll down.
+For nRF5 boards two lines need to be added to platform.txt file of the nRF5 Arduino package. Only nRF51 was tested until now. For details scroll down.
 
 For ESP8266 and ESP32 boards, platform.local.txt from extras folder need to be copied into boards package installation folder and the bundled ArduinoOTA library must be deleted. For details scroll down.
 
@@ -92,7 +93,7 @@ The most common ATmega board with more then 64 kB of flash memory is Arduino Meg
 
 For SDStorage a 'SD bootloader' is required to load the uploaded file from the SD card. There is no good SD bootloader. 2boots works only with not available old types of SD cards and zevero/avr_boot doesn't yet support USB upload of sketch. The SDStorage was tested with zevero/avr_boot. The ATmega_SD example shows how to use this ArduinoOTA library with SD bootloader.
 
-To use remote upload from IDE with SDStorage or InternalStorage, copy platform.local.txt from extras/avr folder, next to platform.txt in the boards package used (Arduino-avr or MCUdude packages). Packages are located in ~/.arduino15/packages/ on Linux and %userprofile%\AppData\Local\Arduino15\packages\ on Windows (AppData is a hidden folder). The platform.local.txt contains a line to create a .bin file and a line to override tools.avrdude.upload.network_pattern, because in platform.txt it is defined for Yun. 
+To use remote upload from IDE with SDStorage or InternalStorage, copy platform.local.txt from extras/avr folder, next to platform.txt in the boards package used (Arduino-avr or MCUdude packages). You can find the location of boards packages in Arduino IDE Preferences as the location of the preferences.txt file at the bottom of the Preferences dialog. It is clickable and opens the folder. There find the boards package in packages folder. 
 
 The IDE upload tool is installed with Arduino AVR core package. At least version 1.2 of the arduinoOTA tool is required. For upload from command line without IDE see the command template in extras/avr/platform.local.txt.
 
@@ -100,7 +101,7 @@ The IDE upload tool is installed with Arduino AVR core package. At least version
 
 The ArduinoOTA library bundled with ESP8266 and ESP32 Arduino packages works only with native WiFi libraries. This library allows to upload a sketch to esp8266 or esp32 over Ethernet with Ethernet or UIPEthernet library. Upload over the native WiFi library works too.
 
-To use this library instead of the bundled library, the bundled library must be removed from the boards package library folder. To override the configuration of OTA upload in platform.txt, copy the platform.local.txt file from extras folder of this library next to platform.txt file in boards package installation folder. Packages are located in ~/.arduino15/packages/ on Linux and %userprofile%\AppData\Local\Arduino15\packages\ on Windows (AppData is a hidden folder).
+To use this library instead of the bundled library, the bundled library must be removed from the boards package library folder. To override the configuration of OTA upload in platform.txt, copy the platform.local.txt file from extras folder of this library next to platform.txt file in boards package installation folder. You can find the location of boards packages in Arduino IDE Preferences as the location of the preferences.txt file at the bottom of the Preferences dialog. It is clickable and opens the folder. There find the boards package in packages folder.
 
 This library supports SPIFFS upload to esp8266 and esp32, but the IDE plugins have the network upload tool hardcoded to espota. It can't be changed in configuration. To upload SPIFFS, call the plugin in Tools menu and after it fails to upload over network, go to location of the created bin file and upload the file with arduinoOTA tool from command line. The location of the file is printed in the IDE console window. Upload command example (linux):
 ```
@@ -116,7 +117,7 @@ If SoftDevice is not used, the sketch is written from address 0. For write to ad
 
 For SD card update use [SDUnRF5 library](https://github.com/jandrassy/SDUnRF5).
 
-To use remote upload from IDE, add lines from [this PR](https://github.com/sandeepmistry/arduino-nRF5/pull/327/commits/4b70ae7207124bd92afa14e562e4f0c4d931220d) to sandeepmistry/hardware/nRF5/0.6.0/platform.txt at the end of section "OpenOCD sketch upload":
+To use remote upload from IDE with SDStorage or InternalStorage, copy platform.local.txt from extras/nRF5 folder, next to platform.txt in the nRF5 boards package. You can find the location of boards packages in Arduino IDE Preferences as the location of the preferences.txt file at the bottom of the Preferences dialog. It is clickable and opens the folder. There find the boards package in packages folder.
 
 If you use SoftDevice, stop BLE before applying update. Use `ArduinoOTA.beforeApply` to register a callback function. For example in setup `ArduinoOTA.beforeApply(shutdown);` and add the function to to sketch:
 
@@ -128,7 +129,7 @@ void shutdown() {
 
 ## Arduino 'network port'
 
-The Arduino IDE detects the Arduino 'network port' using mDNS system. This requires the use of UDP multicast. From networking libraries supported for OTA upload only Ethernet, WiFiNina, WiFi101 and the esp libraries support multicast. For this libraries ArduinoOTA.h at defaults starts the mDNS service.
+The Arduino IDE detects the Arduino 'network port' using mDNS system. This requires the use of UDP multicast. From networking libraries supported for OTA upload only Ethernet, WiFiNina, WiFi101 and the esp libraries support multicast. For these libraries ArduinoOTA.h at defaults starts the mDNS service.
 
 In some networks or on some computers UDP mDNS doesn't work. You can still use the ArduinoOTA library for upload from command line or with the fake programmer trick described elsewhere in this README.
 
