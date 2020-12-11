@@ -24,7 +24,8 @@
 #include <WiFiNINA.h>
 #include <ArduinoHttpClient.h>
 
-#include "arduino_secrets.h" // To load your WiFi secrets
+// Please enter your WiFi sensitive data in the arduino_secrets.h file
+#include "arduino_secrets.h"
 
 const short VERSION = 1;
 
