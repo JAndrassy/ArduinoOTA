@@ -24,10 +24,12 @@
 #include <WiFiNINA.h>
 #include <ArduinoHttpClient.h>
 
+#include "arduino_secrets.h" // To load your WiFi secrets
+
 const short VERSION = 1;
 
-const char MY_SSID[] = "MY-SSID";
-const char MY_PASS[] = "MY-PASSWORD";
+const char MY_SSID[] = SECRET_SSID; // Loaded from arduino_secrets.h
+const char MY_PASS[] = SECRET_PASS; // Loaded from arduino_secrets.h
 
 // WiFiClient    wifiClient;  // HTTP
 WiFiSSLClient wifiClientSSL;  // HTTPS
