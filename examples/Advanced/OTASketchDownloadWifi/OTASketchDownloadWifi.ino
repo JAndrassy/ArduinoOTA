@@ -40,7 +40,7 @@ void handleSketchDownload() {
   const char* SERVER = "www.my-hostname.it";  // Set your correct hostname
   const unsigned short SERVER_PORT = 443;     // Commonly 80 (HTTP) | 443 (HTTPS)
   const char* PATH = "/update-v%d.bin";       // Set the URI to the .bin firmware
-  const unsigned long CHECK_INTERVAL = 60;
+  const unsigned long CHECK_INTERVAL = 6000;  // Time interval between update checks (ms)
 
   // Time interval check
   static unsigned long previousMillis;
