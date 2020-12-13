@@ -23,7 +23,7 @@ The library is a modification of the Arduino WiFi101OTA library.
 
 ## Supported micro-controllers
 
-* ATmega AVR with at least 64 kB of flash (Arduino Mega, [MegaCore](https://github.com/MCUdude/MegaCore) MCUs, MightyCore 1284p and 644)
+* classic ATmega AVR with at least 64 kB of flash (Arduino Mega, [MegaCore](https://github.com/MCUdude/MegaCore) MCUs, MightyCore 1284p and 644)
 * Arduino SAMD boards like Zero, M0 or MKR and the new "Nano 33 IoT" 
 * nRF5 board supported by [nRF5 core](https://github.com/sandeepmistry/arduino-nRF5).
 * boards supported by ESP8266 and ESP32 Arduino boards package  
@@ -32,7 +32,7 @@ The library is a modification of the Arduino WiFi101OTA library.
 ## Supported networking libraries
 
 * Ethernet library - Ethernet shields and modules with Wiznet 5100, 5200 and 5500 chips
-* WiFi101 - WiFi101 shield and MKR 1000
+* WiFi101 - MKR 1000, Arduino WiFi101 shield and Adafruit WINC1500 WiFi shield or module
 * WiFiNINA - MKR 1010, MKR 4000, Nano 33 IoT and any supported MCU with attached ESP32 as SPI network adapter with WiFiNINA firmware
 * WiFiEspAT - esp8266 or ESP32 as network adapter with AT firmware
 * WiFiLink - esp8266 as network adapter with WiFiLink firmware (SPI or Serial)
@@ -180,6 +180,7 @@ Does the OTA uploaded sketch have ArduinoOTA?
 
 * SAMD
     - Arduino MKR Zero
+    - Arduino MKR WiFi 1010
     - Crowduino M0 SD
 * nRF5
     - Seeed Arch Link
