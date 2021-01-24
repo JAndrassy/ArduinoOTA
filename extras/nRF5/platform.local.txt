@@ -1,4 +1,5 @@
 
+compiler.cpp.extra_flags=-fno-delete-null-pointer-checks
 
 tools.openocd.network_cmd={runtime.tools.arduinoOTA.path}/bin/arduinoOTA
 tools.openocd.upload.network_pattern="{network_cmd}" -address {serial.port} -port 65280 -username arduino -password password -sketch "{build.path}/{build.project_name}.bin" -upload /sketch -b
