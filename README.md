@@ -50,7 +50,7 @@ Note for platformio users: Please, don't use this library with platformio. It wa
 
 Arduino SAMD boards (Zero, M0, MKR, Nano 33 IoT) are supported 'out of the box'. Additionally to upload over the internal flash as temporary storage, upload over SD card and over MEM shield's flash is possible. For upload over SD card use the SDU library as shown in the WiFi101_SD_OTA or similar for upload over MKR MEM shield use the SFU library.
 
-For nRF5 boards two lines need to be added to platform.txt file of the nRF5 Arduino package. Only nRF51 was tested until now. For details scroll down.
+For nRF5 boards two lines need to be added to platform.txt file of the nRF5 Arduino package. For details scroll down.
 
 For ESP8266 and ESP32 boards, platform.local.txt from extras folder need to be copied into boards package installation folder and the bundled ArduinoOTA library must be deleted. For details scroll down.
 
@@ -111,13 +111,11 @@ This library supports SPIFFS upload to esp8266 and esp32, but the IDE plugins ha
 
 ## nRF5 support
 
-Note: Only nRF51 was tested for now
-
-If SoftDevice is not used, the sketch is written from address 0. For write to address 0 the sketch must be compiled with -fno-delete-null-pointer-checks.
-
 For SD card update use [SDUnRF5 library](https://github.com/jandrassy/SDUnRF5).
 
 To use remote upload from IDE with SDStorage or InternalStorage, copy platform.local.txt from extras/nRF5 folder, next to platform.txt in the nRF5 boards package. You can find the location of boards packages in Arduino IDE Preferences as the location of the preferences.txt file at the bottom of the Preferences dialog. It is clickable and opens the folder. There find the boards package in packages folder.
+
+If SoftDevice is not used, the sketch is written from address 0. For write to address 0 the sketch must be compiled with -fno-delete-null-pointer-checks. The setting is in extras/nRF5/platform.local.txt.
 
 If you use SoftDevice, stop BLE before applying update. Use `ArduinoOTA.beforeApply` to register a callback function. For example in setup `ArduinoOTA.beforeApply(shutdown);` and add the function to to sketch:
 
@@ -183,7 +181,8 @@ Does the OTA uploaded sketch have ArduinoOTA?
     - Arduino MKR WiFi 1010
     - Crowduino M0 SD
 * nRF5
-    - Seeed Arch Link
+    - Seeed Arch Link (nRF51 board)
+    - [nrf52832 board](https://github.com/jandrassy/ArduinoOTA/issues/1)
 * ATmega
     - Arduino Mega
     - Badio 1284p
