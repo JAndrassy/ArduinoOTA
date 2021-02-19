@@ -11,6 +11,8 @@ char * __text_start__(); // 0x2000, 0x0 without bootloader and 0x4000 for M0 ori
 extern "C" {
 char * __isr_vector();
 }
+#elif defined(ARDUINO_ARCH_MEGAAVR)
+#include <avr/wdt.h>
 #elif defined(__AVR__)
 #include <avr/wdt.h>
 #include <avr/boot.h>
@@ -26,7 +28,7 @@ OTAStorage::OTAStorage() :
         SKETCH_START_ADDRESS((uint32_t) __isr_vector),
         PAGE_SIZE((size_t) NRF_FICR->CODEPAGESIZE),
         MAX_FLASH(PAGE_SIZE * (uint32_t) NRF_FICR->CODESIZE)
-#elif defined(__AVR__)
+#elif defined(__AVR__) && !defined(ARDUINO_ARCH_MEGAAVR)
         SKETCH_START_ADDRESS(0),
         PAGE_SIZE(SPM_PAGESIZE),
         MAX_FLASH((uint32_t) FLASHEND + 1)
@@ -37,7 +39,7 @@ OTAStorage::OTAStorage() :
 #endif
 {
   bootloaderSize = 0;
-#ifdef __AVR__
+#if defined(__AVR__) && !defined(ARDUINO_ARCH_MEGAAVR)
   cli();
   uint8_t highBits = boot_lock_fuse_bits_get(GET_HIGH_FUSE_BITS);
   sei();
@@ -49,7 +51,10 @@ OTAStorage::OTAStorage() :
 }
 
 void ExternalOTAStorage::apply() {
-#ifdef __AVR__
+#if defined(ARDUINO_ARCH_MEGAAVR)
+  wdt_enable(WDT_PERIOD_8CLK_gc);
+  while (true);
+#elif defined(__AVR__)
   wdt_enable(WDTO_15MS);
   while (true);
 #elif defined(ESP8266) || defined(ESP32)
