@@ -87,9 +87,9 @@ The sizes of networking library and the SD library allows the use of ArduinoOTA 
 
 *Side note: There are other network upload options for here excluded ATmega328p: ([Ariadne bootloader](https://github.com/loathingKernel/ariadne-bootloader) for Wiznet chips, [WiFiLink firmware](https://github.com/jandrassy/arduino-firmware-wifilink) for the esp8266) or [AvrDudeTelnet](https://github.com/jandrassy/lab/blob/master/AvrDudeTelnet/AvrDudeTelnet.ino) upload (Linux only).*
 
-For upload with ArduinoOTA library over InternalStorage, Optiboot bootloader with [`copy_flash_pages` function](https://github.com/Optiboot/optiboot/pull/269) is required. MegaCore 2.0.2 bootloader source has `copy_flash_pages` functions. (The built hex files do not contain it.) 
+For upload with ArduinoOTA library over InternalStorage, Optiboot bootloader with [`copy_flash_pages` function](https://github.com/Optiboot/optiboot/pull/269) is required. MegaCore and MightyCore by [MCUDude](https://github.com/MCUdude) have Optiboot binaries with `copy_flash_pages` function ready to be burn to your ATmega.
 
-The most common ATmega board with more then 64 kB of flash memory is Arduino Mega. To use it with ArduinoOTA library, you can't use it directly with the Arduino AVR package, because the package doesn't have the right fuse settings for Mega with Optiboot. You can download [my boards definitions](https://github.com/jandrassy/my_boards) and use it [to burn](https://arduino.stackexchange.com/questions/473/how-do-i-burn-the-bootloader) the modified Optiboot and to upload sketches to your Mega over USB and over network. 
+The most common Arduino ATmega board with more than 64 kB of flash memory is Arduino Mega. To use it with ArduinoOTA library, you can't use it directly with the Arduino AVR package, because the package doesn't have the right fuse settings for Mega with Optiboot. You can download [my boards definitions](https://github.com/jandrassy/my_boards) and use it [to burn](https://arduino.stackexchange.com/questions/473/how-do-i-burn-the-bootloader) the modified Optiboot and to upload sketches to your Mega over USB and over network. 
 
 For SDStorage a 'SD bootloader' is required to load the uploaded file from the SD card. There is no good SD bootloader. 2boots works only with not available old types of SD cards and zevero/avr_boot doesn't yet support USB upload of sketch. The SDStorage was tested with zevero/avr_boot. The ATmega_SD example shows how to use this ArduinoOTA library with SD bootloader.
 
@@ -99,7 +99,7 @@ The IDE upload tool is installed with Arduino AVR core package. At least version
 
 ## ESP8266 and ESP32 support
 
-The ArduinoOTA library bundled with ESP8266 and ESP32 Arduino packages works only with native WiFi libraries. This library allows to upload a sketch to esp8266 or esp32 over Ethernet with Ethernet or UIPEthernet library. Upload over the native WiFi library works too.
+The ArduinoOTA library bundled with ESP8266 and ESP32 Arduino packages works only with native WiFi libraries. This library allows to upload a sketch to esp8266 or esp32 over Ethernet with Ethernet or EthernetENC library. Upload over the native WiFi library works too.
 
 To use this library instead of the bundled library, the bundled library must be removed from the boards package library folder. To override the configuration of OTA upload in platform.txt, copy the platform.local.txt file from extras folder of this library next to platform.txt file in boards package installation folder. You can find the location of boards packages in Arduino IDE Preferences as the location of the preferences.txt file at the bottom of the Preferences dialog. It is clickable and opens the folder. There find the boards package in packages folder.
 
@@ -178,8 +178,9 @@ Does the OTA uploaded sketch have ArduinoOTA?
 
 * SAMD
     - Arduino MKR Zero
-    - Arduino MKR WiFi 1010
     - Crowduino M0 SD
+    - [Arduino MKR WiFi 1010](https://github.com/jandrassy/ArduinoOTA/issues/46)
+    - [Adafruit Feather M0 Express](https://github.com/jandrassy/ArduinoOTA/discussions/77)
 * nRF5
     - Seeed Arch Link (nRF51 board)
     - [nrf52832 board](https://github.com/jandrassy/ArduinoOTA/issues/1)
