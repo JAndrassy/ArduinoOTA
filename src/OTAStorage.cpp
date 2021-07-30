@@ -3,7 +3,11 @@
 #if defined(ARDUINO_ARCH_SAMD)
 static const uint32_t pageSizes[] = { 8, 16, 32, 64, 128, 256, 512, 1024 };
 static const uint32_t eepromSizes[] = { 16384, 8192, 4096, 2048, 1024, 512, 256, 0 };
-#define EEPROM_EMULATION_RESERVATION ((*(uint32_t*)(NVMCTRL_FUSES_EEPROM_SIZE_ADDR) & NVMCTRL_FUSES_EEPROM_SIZE_Msk) >> NVMCTRL_FUSES_EEPROM_SIZE_Pos)
+#if defined(__SAMD51__)
+#  define EEPROM_EMULATION_RESERVATION 0
+#else
+#  define EEPROM_EMULATION_RESERVATION ((*(uint32_t*)(NVMCTRL_FUSES_EEPROM_SIZE_ADDR) & NVMCTRL_FUSES_EEPROM_SIZE_Msk) >> NVMCTRL_FUSES_EEPROM_SIZE_Pos)
+#endif
 extern "C" {
 char * __text_start__(); // 0x2000, 0x0 without bootloader and 0x4000 for M0 original bootloader
 }

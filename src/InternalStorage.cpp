@@ -54,17 +54,41 @@ extern "C" {
 
   __attribute__ ((long_call, noinline, section (".data#"))) //
   void waitForReady() {
-#if defined(ARDUINO_ARCH_SAMD)
+#if defined(__SAMD51__)
+    while (!NVMCTRL->STATUS.bit.READY);
+#elif defined(ARDUINO_ARCH_SAMD)
     while (!NVMCTRL->INTFLAG.bit.READY);
 #elif defined(ARDUINO_ARCH_NRF5)
     while (NRF_NVMC->READY == NVMC_READY_READY_Busy);
 #endif
   }
+  
+#if defined(__SAMD51__)
+// Invalidate all CMCC cache entries if CMCC cache is enabled.
+  __attribute__ ((long_call, noinline, section (".data#")))
+  static void invalidate_CMCC_cache()
+  {
+    if (CMCC->SR.bit.CSTS) {
+      CMCC->CTRL.bit.CEN = 0;
+      while (CMCC->SR.bit.CSTS) {}
+      CMCC->MAINT0.bit.INVALL = 1;
+      CMCC->CTRL.bit.CEN = 1;
+    }
+  }
+#endif
 
   __attribute__ ((long_call, noinline, section (".data#")))
   static void eraseFlash(int address, int length, int pageSize)
   {
-#if defined(ARDUINO_ARCH_SAMD)
+#if defined(__SAMD51__)
+    int rowSize = (pageSize * NVMCTRL->PARAM.bit.NVMP) / 64;
+    for (int i = 0; i < length; i += rowSize) {
+      NVMCTRL->ADDR.reg = ((uint32_t)(address + i));
+      NVMCTRL->CTRLB.reg = NVMCTRL_CTRLB_CMDEX_KEY | NVMCTRL_CTRLB_CMD_EB;
+      waitForReady();
+      invalidate_CMCC_cache();
+    }
+#elif defined(ARDUINO_ARCH_SAMD)
     int rowSize = pageSize * 4;
     for (int i = 0; i < length; i += rowSize) {
       NVMCTRL->ADDR.reg = ((uint32_t)(address + i)) / 2;
@@ -94,7 +118,7 @@ extern "C" {
   __attribute__ ((long_call, noinline, section (".data#")))
   static void copyFlashAndReset(int dest, int src, int length, int pageSize)
   {
-    uint32_t* d = (uint32_t*)dest;
+    volatile uint32_t* d = (volatile uint32_t*)dest;
     uint32_t* s = (uint32_t*)src;
 
     eraseFlash(dest, length, pageSize);
@@ -115,8 +139,15 @@ int InternalStorageClass::open(int length)
   _writeIndex = 0;
   _writeAddress = (uint32_t*)STORAGE_START_ADDRESS;
 
-#ifdef ARDUINO_ARCH_SAMD
-  // enable auto page writes
+#if defined(__SAMD51__)
+  // Enable auto dword writes
+  NVMCTRL->CTRLA.bit.WMODE = NVMCTRL_CTRLA_WMODE_ADW_Val;
+  waitForReady();
+  // Disable NVMCTRL cache while writing, per SAMD51 errata
+  NVMCTRL->CTRLA.bit.CACHEDIS0 = 1;
+  NVMCTRL->CTRLA.bit.CACHEDIS1 = 1;
+#elif defined(ARDUINO_ARCH_SAMD)
+  // Enable auto page writes
   NVMCTRL->CTRLB.bit.MANW = 0;
 #endif
 
