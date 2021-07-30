@@ -81,6 +81,8 @@ The WiFi101OTA and ArduinoOTA libraries were created for upload from IDE. But in
 
 In advanced section of examples you can find examples of sketch update over download from a http server. One example shows update over the InternalStorage object of the ArduinoOTA library. The example for update over SD card doesn't use this library at all.    
 
+The Blynk library uses this library in its Blynk.Edgent examples to store and apply user's updated sketch downloaded from the Blynk IoT cloud storage.
+
 ## ATmega support
 
 The sizes of networking library and the SD library allows the use of ArduinoOTA library only with ATmega MCUs with at least 64 kB flash memory. 
@@ -176,11 +178,15 @@ Does the OTA uploaded sketch have ArduinoOTA?
 
 ## Boards tested
 
-* SAMD
+* SAMD21
     - Arduino MKR Zero
     - Crowduino M0 SD
     - [Arduino MKR WiFi 1010](https://github.com/jandrassy/ArduinoOTA/issues/46)
+    - Arduino MKR WiFi 1000 (with Blynk.Edgent)
+    - Arduino Nano 33 IoT (with Blynk.Edgent)
     - [Adafruit Feather M0 Express](https://github.com/jandrassy/ArduinoOTA/discussions/77)
+* SAMD51
+    - [Seeed Wio Terminal](https://github.com/jandrassy/ArduinoOTA/pull/104) (with Blynk.Edgent)
 * nRF5
     - Seeed Arch Link (nRF51 board)
     - [nrf52832 board](https://github.com/jandrassy/ArduinoOTA/issues/1)
