@@ -76,7 +76,7 @@ void WiFiOTAClass::begin(IPAddress& localIP, const char* name, const char* passw
 {
   localIp = localIP;
   _name = name;
-  _expectedAuthorization = "Basic " + base64Encode("arduino:" + String(password));
+  _expectedAuthorization = "Basic " + base64Encode(String(name) + ":" + String(password));
   _storage = &storage;
 }
 
