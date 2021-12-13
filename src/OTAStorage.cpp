@@ -15,6 +15,10 @@ char * __text_start__(); // 0x2000, 0x0 without bootloader and 0x4000 for M0 ori
 extern "C" {
 char * __isr_vector();
 }
+#elif defined(ARDUINO_ARCH_RP2040)
+#include <hardware/flash.h>
+extern "C" uint8_t _FS_start;
+extern "C" uint8_t _EEPROM_start;
 #elif defined(ARDUINO_ARCH_MEGAAVR)
 #include <avr/wdt.h>
 #elif defined(__AVR__)
@@ -32,6 +36,10 @@ OTAStorage::OTAStorage() :
         SKETCH_START_ADDRESS((uint32_t) __isr_vector),
         PAGE_SIZE((size_t) NRF_FICR->CODEPAGESIZE),
         MAX_FLASH(PAGE_SIZE * (uint32_t) NRF_FICR->CODESIZE)
+#elif defined(ARDUINO_ARCH_RP2040)
+        SKETCH_START_ADDRESS(0),
+        PAGE_SIZE(FLASH_PAGE_SIZE),
+        MAX_FLASH((uint32_t) min(&_FS_start, &_EEPROM_start) - XIP_BASE)
 #elif defined(__AVR__) && !defined(ARDUINO_ARCH_MEGAAVR)
         SKETCH_START_ADDRESS(0),
         PAGE_SIZE(SPM_PAGESIZE),

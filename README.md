@@ -26,6 +26,7 @@ The library is a modification of the Arduino WiFi101OTA library.
 * classic ATmega AVR with at least 64 kB of flash (Arduino Mega, [MegaCore](https://github.com/MCUdude/MegaCore) MCUs, MightyCore 1284p and 644)
 * Arduino SAMD boards like Zero, M0 or MKR and the new "Nano 33 IoT" 
 * nRF5 board supported by [nRF5 core](https://github.com/sandeepmistry/arduino-nRF5).
+* RP2040 with [Pico core](https://github.com/earlephilhower/arduino-pico)
 * boards supported by ESP8266 and ESP32 Arduino boards package  
 * any board with MCU with SD bootloader
 
@@ -52,7 +53,9 @@ Arduino SAMD boards (Zero, M0, MKR, Nano 33 IoT) are supported 'out of the box'.
 
 For nRF5 boards two lines need to be added to platform.txt file of the nRF5 Arduino package. For details scroll down.
 
-For ESP8266 and ESP32 boards, platform.local.txt from extras folder need to be copied into boards package installation folder and the bundled ArduinoOTA library must be deleted. For details scroll down.
+For RP2040 boards platform.local.txt from extras folder has to be copied into boards package installation folder.
+
+For ESP8266 and ESP32 boards, platform.local.txt from extras folder has to be copied into boards package installation folder and the bundled ArduinoOTA library must be deleted. For details scroll down.
 
 ATmega boards require to flash a modified Optiboot bootloader for flash write operations. Details are below.
 
