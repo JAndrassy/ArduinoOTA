@@ -31,6 +31,7 @@ InternalStorageClass::InternalStorageClass() :
   MAX_PARTIONED_SKETCH_SIZE((MAX_FLASH - SKETCH_START_ADDRESS) / 2),
   STORAGE_START_ADDRESS(SKETCH_START_ADDRESS + MAX_PARTIONED_SKETCH_SIZE)
 {
+  pageAlignedLength = 0;
   _writeIndex = 0;
   _writeAddress = nullptr;
 }
@@ -135,7 +136,11 @@ extern "C" {
 
 int InternalStorageClass::open(int length)
 {
-  (void)length;
+  if (length > MAX_PARTIONED_SKETCH_SIZE)
+    return 0;
+
+  pageAlignedLength = ((length / PAGE_SIZE) + 1) * PAGE_SIZE; // align to page up
+
   _writeIndex = 0;
   _writeAddress = (uint32_t*)STORAGE_START_ADDRESS;
 
@@ -151,7 +156,7 @@ int InternalStorageClass::open(int length)
   NVMCTRL->CTRLB.bit.MANW = 0;
 #endif
 
-  eraseFlash(STORAGE_START_ADDRESS, MAX_PARTIONED_SKETCH_SIZE, PAGE_SIZE);
+  eraseFlash(STORAGE_START_ADDRESS, pageAlignedLength, PAGE_SIZE);
 
   return 1;
 }
@@ -190,7 +195,7 @@ void InternalStorageClass::apply()
   // disable interrupts, as vector table will be erase during flash sequence
   noInterrupts();
 
-  copyFlashAndReset(SKETCH_START_ADDRESS, STORAGE_START_ADDRESS, MAX_PARTIONED_SKETCH_SIZE, PAGE_SIZE);
+  copyFlashAndReset(SKETCH_START_ADDRESS, STORAGE_START_ADDRESS, pageAlignedLength, PAGE_SIZE);
 }
 
 long InternalStorageClass::maxSize()

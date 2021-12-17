@@ -48,6 +48,7 @@ private:
     uint8_t u8[4];
   } _addressData;
 
+  uint32_t pageAlignedLength;
   int _writeIndex;
   uint32_t* _writeAddress;
 };
