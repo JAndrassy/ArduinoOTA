@@ -26,7 +26,7 @@ The library is a modification of the Arduino WiFi101OTA library.
 * classic ATmega AVR with at least 64 kB of flash (Arduino Mega, [MegaCore](https://github.com/MCUdude/MegaCore) MCUs, MightyCore 1284p and 644)
 * Arduino SAMD boards like Zero, M0 or MKR and the new "Nano 33 IoT" 
 * nRF5 board supported by [nRF5 core](https://github.com/sandeepmistry/arduino-nRF5).
-* RP2040 with [Pico core](https://github.com/earlephilhower/arduino-pico)
+* RP2040 boards with [Pico core](https://github.com/earlephilhower/arduino-pico)
 * boards supported by ESP8266 and ESP32 Arduino boards package  
 * any board with MCU with SD bootloader
 
@@ -190,6 +190,8 @@ Does the OTA uploaded sketch have ArduinoOTA?
     - [Adafruit Feather M0 Express](https://github.com/jandrassy/ArduinoOTA/discussions/77)
 * SAMD51
     - [Seeed Wio Terminal](https://github.com/jandrassy/ArduinoOTA/pull/104) (with Blynk.Edgent)
+* RP2040
+    - Raspberry Pi Pico
 * nRF5
     - Seeed Arch Link (nRF51 board)
     - [nrf52832 board](https://github.com/jandrassy/ArduinoOTA/issues/1)

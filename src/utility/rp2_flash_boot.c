@@ -54,7 +54,7 @@ static void __no_inline_not_in_flash_func(flash_enable_xip_via_boot2)(void) {
  * this function runs exclusively in RAM and after erasing the requested sectors
  * only calls functions from ROM. (rom_func_lookup() is in flash!)
  * note: interrupts and second core must be disabled.
- * note: parameters must be multiple of FLASH_SECTOR_ADDRESS
+ * note: parameters must be multiple of FLASH_SECTOR_SIZE
  * the function is based on functions in flash.c
  */
 void __no_inline_not_in_flash_func(copy_flash_pages)(uint32_t flash_offs, const uint8_t *data, size_t count, bool reset) {

@@ -5,7 +5,7 @@
 recipe.objcopy.bin.pattern="{compiler.path}{compiler.elf2hex.cmd}" {compiler.elf2hex.bin.flags} {compiler.elf2hex.extra_flags} "{build.path}/{build.project_name}.elf" "{build.path}/{build.project_name}.bin"
 
 tools.uf2conv.network_cmd={runtime.tools.arduinoOTA.path}/bin/arduinoOTA
-tools.uf2conv.upload.network_pattern="{network_cmd}" -address {serial.port} -port 65280 -username arduino -password password -sketch "{build.path}/{build.project_name}.bin" -upload /sketch -b
+tools.uf2conv.upload.network_pattern="{network_cmd}" -address {serial.port} -port 65280 -username arduino -password "{network.password}" -sketch "{build.path}/{build.project_name}.bin" -upload /sketch -b
 
 tools.arduinoOTA.cmd={runtime.tools.arduinoOTA.path}/bin/arduinoOTA
 tools.arduinoOTA.program.params.verbose=
