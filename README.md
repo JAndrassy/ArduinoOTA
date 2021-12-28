@@ -27,6 +27,7 @@ The library is a modification of the Arduino WiFi101OTA library.
 * Arduino SAMD boards like Zero, M0 or MKR and the new "Nano 33 IoT" 
 * nRF5 board supported by [nRF5 core](https://github.com/sandeepmistry/arduino-nRF5).
 * RP2040 boards with [Pico core](https://github.com/earlephilhower/arduino-pico)
+* STM32F1 boards with [STM32 core](https://github.com/stm32duino/Arduino_Core_STM32)
 * boards supported by ESP8266 and ESP32 Arduino boards package  
 * any board with MCU with SD bootloader
 
@@ -53,7 +54,7 @@ Arduino SAMD boards (Zero, M0, MKR, Nano 33 IoT) are supported 'out of the box'.
 
 For nRF5 boards two lines need to be added to platform.txt file of the nRF5 Arduino package. For details scroll down.
 
-For RP2040 boards platform.local.txt from extras folder has to be copied into boards package installation folder.
+For RP2040 and STM32F1 boards, platform.local.txt from extras folder has to be copied into boards package installation folder.
 
 For ESP8266 and ESP32 boards, platform.local.txt from extras folder has to be copied into boards package installation folder and the bundled ArduinoOTA library must be deleted. For details scroll down.
 
@@ -184,14 +185,16 @@ Does the OTA uploaded sketch have ArduinoOTA?
 * SAMD21
     - Arduino MKR Zero
     - Crowduino M0 SD
+    - Arduino Nano 33 IoT
     - [Arduino MKR WiFi 1010](https://github.com/jandrassy/ArduinoOTA/issues/46)
     - Arduino MKR WiFi 1000 (with Blynk.Edgent)
-    - Arduino Nano 33 IoT (with Blynk.Edgent)
     - [Adafruit Feather M0 Express](https://github.com/jandrassy/ArduinoOTA/discussions/77)
 * SAMD51
     - [Seeed Wio Terminal](https://github.com/jandrassy/ArduinoOTA/pull/104) (with Blynk.Edgent)
 * RP2040
     - Raspberry Pi Pico
+* STM32F1
+    - BluePill F103CB (128kB flash)
 * nRF5
     - Seeed Arch Link (nRF51 board)
     - [nrf52832 board](https://github.com/jandrassy/ArduinoOTA/issues/1)

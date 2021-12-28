@@ -1,0 +1,13 @@
+
+# This configuration file supports the general ArduinoOTA library https://github.com/jandrassy/ArduinoOTA
+
+tools.stm32CubeProg.network_cmd={runtime.tools.arduinoOTA.path}/bin/arduinoOTA
+tools.stm32CubeProg.upload.network_pattern="{network_cmd}" -address {serial.port} -port 65280 -username arduino -password "{network.password}" -sketch "{build.path}/{build.project_name}.bin" -upload /sketch -b
+
+tools.maple_upload.network_cmd={runtime.tools.arduinoOTA.path}/bin/arduinoOTA
+tools.maple_upload.upload.network_pattern="{network_cmd}" -address {serial.port} -port 65280 -username arduino -password "{network.password}" -sketch "{build.path}/{build.project_name}.bin" -upload /sketch -b
+
+tools.arduinoOTA.cmd={runtime.tools.arduinoOTA.path}/bin/arduinoOTA
+tools.arduinoOTA.program.params.verbose=
+tools.arduinoOTA.program.params.quiet=
+tools.arduinoOTA.program.pattern="{cmd}" -v -address {ip} -port 65280 -username arduino -password password -sketch "{build.path}/{build.project_name}.bin" -upload /sketch -b
