@@ -82,9 +82,11 @@ In IDE select in Tools menu the "Arduino OTA (...)" programmer and use "Upload u
 
 ## OTA update as download
 
+*Note: Don't use this for esp8266 and esp32 Arduino. Use the ESP8266httpUpdate and the esp32 HTTPUpdate library for OTA update download for esp8266/esp32. Or use the Update object from esp8266 core ot the Update library directly.*
+
 The WiFi101OTA and ArduinoOTA libraries were created for upload from IDE. But in some scenarios as for example deployed sleeping battery powered devices it is better to have the update available for download by the device.
 
-In advanced section of examples you can find examples of sketch update over download from a http server. One example shows update over the InternalStorage object of the ArduinoOTA library. The example for update over SD card doesn't use this library at all.    
+In advanced section of examples you can find examples of sketch update over download from a http server. One example shows update over the InternalStorage object of the ArduinoOTA library. The example for update over SD card doesn't use this library at all.
 
 The Blynk library uses this library in its Blynk.Edgent examples to store and apply user's updated sketch downloaded from the Blynk IoT cloud storage.
 
