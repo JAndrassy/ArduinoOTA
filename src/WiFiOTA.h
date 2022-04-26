@@ -19,6 +19,8 @@
  by Sandeep Mistry (Arduino)
  modified for ArduinoOTA Dec 2018
  by Juraj Andrassy
+ modified for ArduinoOTA onStart Callback Apr 2022
+ by Andrej Hradnansky
 */
 
 #ifndef _WIFI_OTA_H_INCLUDED
@@ -49,6 +51,10 @@ public:
   void onError(void (*fn)(int code, const char* msg)) {
     onErrorCallback = fn;
   }
+  
+  void onStart(void (*fn)(void)) {
+	  onStartCallback = fn;
+  }
 
 private:
   void sendHttpResponse(Client& client, int code, const char* status);
@@ -64,6 +70,7 @@ private:
   
   void (*beforeApplyCallback)(void);
   void (*onErrorCallback)(int code, const char*);
+  void (*onStartCallback)(void);
 };
 
 #endif
