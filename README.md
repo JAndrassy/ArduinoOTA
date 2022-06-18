@@ -28,7 +28,7 @@ The library is a modification of the Arduino WiFi101OTA library.
 * Arduino SAMD boards like Zero, M0 or MKR and the new "Nano 33 IoT" 
 * nRF5 board supported by [nRF5 core](https://github.com/sandeepmistry/arduino-nRF5).
 * RP2040 boards with [Pico core](https://github.com/earlephilhower/arduino-pico)
-* STM32F1 boards with [STM32 core](https://github.com/stm32duino/Arduino_Core_STM32)
+* STM32F boards with [STM32 core](https://github.com/stm32duino/Arduino_Core_STM32)
 * boards supported by ESP8266 and ESP32 Arduino boards package  
 * any board with MCU with SD bootloader
 
@@ -196,8 +196,9 @@ Does the OTA uploaded sketch have ArduinoOTA?
     - [Seeed Wio Terminal](https://github.com/jandrassy/ArduinoOTA/pull/104) (with Blynk.Edgent)
 * RP2040
     - Raspberry Pi Pico
-* STM32F1
+* STM32
     - BluePill F103CB (128kB flash)
+    - BlackPill F411CE
 * nRF5
     - Seeed Arch Link (nRF51 board)
     - [nrf52832 board](https://github.com/jandrassy/ArduinoOTA/issues/1)

@@ -15,7 +15,7 @@ char * __text_start__(); // 0x2000, 0x0 without bootloader and 0x4000 for M0 ori
 extern "C" {
 char * __isr_vector();
 }
-#elif defined(STM32F1xx)
+#elif defined(ARDUINO_ARCH_STM32)
 #include "stm32yyxx_ll_utils.h"
 extern "C" char * g_pfnVectors; // at first address of the binary. 0x0000 without bootloader. 0x2000 with Maple bootloader
 #elif defined(ARDUINO_ARCH_RP2040)
@@ -39,9 +39,13 @@ OTAStorage::OTAStorage() :
         SKETCH_START_ADDRESS((uint32_t) __isr_vector),
         PAGE_SIZE((size_t) NRF_FICR->CODEPAGESIZE),
         MAX_FLASH(PAGE_SIZE * (uint32_t) NRF_FICR->CODESIZE)
-#elif defined(STM32F1xx)
+#elif defined(ARDUINO_ARCH_STM32)
         SKETCH_START_ADDRESS((uint32_t) &g_pfnVectors - FLASH_BASE), // start address depends on bootloader size
+#ifdef FLASH_PAGE_SIZE
         PAGE_SIZE(FLASH_PAGE_SIZE),
+#else
+        PAGE_SIZE(4), //for FLASH_TYPEPROGRAM_WORD
+#endif
         MAX_FLASH((min(LL_GetFlashSize(), 512ul) * 1024)) // LL_GetFlashSize returns size in kB. 512 is max for a bank
 #elif defined(ARDUINO_ARCH_RP2040)
         SKETCH_START_ADDRESS(0),

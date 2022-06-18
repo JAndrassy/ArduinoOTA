@@ -25,7 +25,7 @@
 class InternalStorageSTM32Class : public OTAStorage {
 public:
 
-  InternalStorageSTM32Class();
+  InternalStorageSTM32Class(uint8_t sector);
 
   virtual int open(int length);
   virtual size_t write(uint8_t);
@@ -40,6 +40,7 @@ private:
     uint8_t u8[4];
   } addressData;
 
+  uint8_t sector; // for models with flash organized into sectors
   uint32_t maxSketchSize;
   uint32_t storageStartAddress;
   uint32_t pageAlignedLength;
