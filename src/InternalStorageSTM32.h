@@ -17,8 +17,8 @@
 
  */
 
-#ifndef _INTERNAL_STORAGE_RP2_H_INCLUDED
-#define _INTERNAL_STORAGE_RP2_H_INCLUDED
+#ifndef _INTERNAL_STORAGE_STM32_H_INCLUDED
+#define _INTERNAL_STORAGE_STM32_H_INCLUDED
 
 #include "OTAStorage.h"
 
@@ -36,8 +36,8 @@ public:
 
 private:
   union {
-    uint64_t u64;
-    uint8_t u8[8];
+    uint32_t u32;
+    uint8_t u8[4];
   } addressData;
 
   uint32_t maxSketchSize;

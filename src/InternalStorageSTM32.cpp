@@ -26,7 +26,7 @@
 
 InternalStorageSTM32Class::InternalStorageSTM32Class() {
   maxSketchSize = (MAX_FLASH - SKETCH_START_ADDRESS) / 2;
-  maxSketchSize = (maxSketchSize / PAGE_SIZE) * PAGE_SIZE; // align to sector
+  maxSketchSize = (maxSketchSize / PAGE_SIZE) * PAGE_SIZE; // align to page
   storageStartAddress = FLASH_BASE + SKETCH_START_ADDRESS + maxSketchSize;
   pageAlignedLength = 0;
   writeIndex = 0;
@@ -38,7 +38,7 @@ int InternalStorageSTM32Class::open(int length) {
   if (length > maxSketchSize)
     return 0;
 
-  pageAlignedLength = ((length / PAGE_SIZE) + 1) * PAGE_SIZE; // align to sector up
+  pageAlignedLength = ((length / PAGE_SIZE) + 1) * PAGE_SIZE; // align to page up
   flashWriteAddress = storageStartAddress;
   writeIndex = 0;
 
@@ -58,12 +58,12 @@ size_t InternalStorageSTM32Class::write(uint8_t b) {
   addressData.u8[writeIndex] = b;
   writeIndex++;
 
-  if (writeIndex == 8) {
+  if (writeIndex == 4) {
     writeIndex = 0;
 
-    if (HAL_FLASH_Program(FLASH_TYPEPROGRAM_DOUBLEWORD, flashWriteAddress, addressData.u64) != HAL_OK)
+    if (HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, flashWriteAddress, addressData.u32) != HAL_OK)
       return 0;
-    flashWriteAddress += 8;
+    flashWriteAddress += 4;
   }
   return 1;
 }
