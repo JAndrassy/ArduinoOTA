@@ -19,8 +19,6 @@
  by Sandeep Mistry (Arduino)
  modified for ArduinoOTA Dec 2018, Apr 2019
  by Juraj Andrassy
- modified for ArduinoOTA onStart Callback Apr 2022
- by Andrej Hradnansky
 */
 
 #include <Arduino.h>

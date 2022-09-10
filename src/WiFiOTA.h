@@ -19,8 +19,6 @@
  by Sandeep Mistry (Arduino)
  modified for ArduinoOTA Dec 2018
  by Juraj Andrassy
- modified for ArduinoOTA onStart Callback Apr 2022
- by Andrej Hradnansky
 */
 
 #ifndef _WIFI_OTA_H_INCLUDED
