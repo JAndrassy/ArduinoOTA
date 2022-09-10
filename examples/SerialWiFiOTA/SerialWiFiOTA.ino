@@ -1,8 +1,6 @@
 /*
 
- This example polls for sketch updates over WiFi module on Serial1,
- sketches can be updated by selecting a network port from within
- the Arduino IDE: Tools -> Port -> Network Ports ...
+ This example polls for sketch updates over WiFi module on Serial1.
 
  created 13 July 2010
  by dlf (Metodo2 srl)
@@ -16,6 +14,16 @@
 
 #include <WiFiEspAT.h>
 #include <ArduinoOTA.h>
+#include <SoftwareSerial.h>
+
+// Emulate Serial1 on pins 6/7 if not present
+#if defined(ARDUINO_ARCH_AVR) && !defined(HAVE_HWSERIAL1)
+#include <SoftwareSerial.h>
+SoftwareSerial Serial1(6, 7); // RX, TX
+#define AT_BAUD_RATE 9600
+#else
+#define AT_BAUD_RATE 115200
+#endif
 
 void setup() {
 
