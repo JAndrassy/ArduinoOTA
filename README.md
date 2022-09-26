@@ -75,6 +75,7 @@ Example OTA 'programmer' configuration in programmers.txt:
 ```
 arduinoOTA104.name=Arduino OTA (192.168.1.104)
 arduinoOTA104.program.tool=arduinoOTA
+arduinoOTA104.program.default=arduinoOTA
 arduinoOTA104.ip=192.168.1.104
 ``` 
 
