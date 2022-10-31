@@ -81,6 +81,8 @@ arduinoOTA104.ip=192.168.1.104
 
 In IDE select in Tools menu the "Arduino OTA (...)" programmer and use "Upload using programmer" from the Sketch menu in IDE.
 
+Important! If you test OTA with the 'fake' programmer, close the Serial Monitor in IDE. With Serial Monitor open, IDE will reset the board after upload tool finishes. The board then doesn't finish to apply the update.
+
 ## OTA update as download
 
 *Note: Don't use this for esp8266 and esp32 Arduino. Use the ESP8266httpUpdate and the esp32 HTTPUpdate library for OTA update download for esp8266/esp32. Or use the Update object from esp8266 core ot the Update library directly.*
@@ -178,6 +180,8 @@ The final loading of the uploaded binary is in some cases not under control of t
 For SD card way the SD bootloader or the SDU library is responsible for loading the new binary. So SD bootloader must be present and in case of SDU, the uploaded sketch must contain the SDU library.
 
 For AVR InternalStorage upload the final loading is done by the Optiboot with `copy_flash_pages` function. Optiboot 8 without `copy_flash_pages` will successfully store the binary to upper half of the flash but will not copy it to run location in flash. 
+
+If you test OTA with the 'fake' programmer, close the Serial Monitor in IDE. With Serial Monitor open, IDE will reset the board after upload tool finishes. The board then doesn't finish to apply the update.
  
 ### Only the first OTA upload works
 
