@@ -21,8 +21,6 @@
  by Juraj Andrassy
 */
 
-#if !defined(NO_OTA_NETWORK)
-
 #include <Arduino.h>
 
 #include "WiFiOTA.h"
@@ -371,6 +369,4 @@ void WiFiOTAClass::flushRequestBody(Client& client, long contentLength)
     }
   }
 }
-
-#endif // NO_OTA_NETWORK
 
