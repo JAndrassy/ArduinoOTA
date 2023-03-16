@@ -19,9 +19,7 @@
 #ifndef _ARDUINOOTA_H_
 #define _ARDUINOOTA_H_
 
-#if !defined(NO_OTA_NETWORK)
 #include "WiFiOTA.h"
-#endif
 
 #ifdef __AVR__
 #if FLASHEND >= 0xFFFF
