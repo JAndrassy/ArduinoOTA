@@ -188,7 +188,9 @@ void InternalStorageClass::close()
     write(0xff);
   }
 
-  pageAlignedLength = (_writeAddress - (uint32_t*)STORAGE_START_ADDRESS) * 4;
+  // Re-calculate pageAlignedLength in case the actually written binary
+  // is smaller then the size provided in open()
+  pageAlignedLength = (_writeAddress - (uint32_t*)STORAGE_START_ADDRESS) * sizeof(uint32_t);
 }
 
 void InternalStorageClass::clear()
