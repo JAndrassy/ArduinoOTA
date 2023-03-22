@@ -20,6 +20,7 @@
 #define _ARDUINOOTA_H_
 
 #include "WiFiOTA.h"
+
 #ifdef __AVR__
 #if FLASHEND >= 0xFFFF
 #include "InternalStorageAVR.h"
@@ -109,7 +110,9 @@ public:
 
 };
 
-#if defined(ethernet_h_) || defined(ethernet_h) // Ethernet library
+#if defined(NO_OTA_NETWORK)
+// Disable network libraries
+#elif defined(ethernet_h_) || defined(ethernet_h) // Ethernet library
 #ifdef NO_OTA_PORT
 ArduinoOTAClass  <EthernetServer, EthernetClient>   ArduinoOTA;
 #else
