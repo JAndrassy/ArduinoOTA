@@ -168,8 +168,8 @@ size_t InternalStorageClass::write(uint8_t b)
     _writeIndex = 0;
 
     // Erase page if needed
-    if ((size_t)(_writeAddress) % PAGE_SIZE == 0) {
-      eraseFlash(_writeAddress, PAGE_SIZE, PAGE_SIZE);
+    if ((int)(_writeAddress) % PAGE_SIZE == 0) {
+      eraseFlash((int)_writeAddress, PAGE_SIZE, PAGE_SIZE);
     }
 
     *_writeAddress = _addressData.u32;
