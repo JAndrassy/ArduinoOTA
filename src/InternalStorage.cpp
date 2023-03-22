@@ -156,9 +156,6 @@ int InternalStorageClass::open(int length)
   NVMCTRL->CTRLB.bit.MANW = 0;
 #endif
 
-  // Erase first page only
-  eraseFlash(STORAGE_START_ADDRESS, PAGE_SIZE, PAGE_SIZE);
-
   return 1;
 }
 
@@ -170,17 +167,16 @@ size_t InternalStorageClass::write(uint8_t b)
   if (_writeIndex == 4) {
     _writeIndex = 0;
 
+    // Erase page if needed
+    if ((size_t)(_writeAddress) % PAGE_SIZE == 0) {
+      eraseFlash(_writeAddress, PAGE_SIZE, PAGE_SIZE);
+    }
+
     *_writeAddress = _addressData.u32;
 
     _writeAddress++;
 
     waitForReady();
-
-    // Erase next page if needed
-    const size_t nextAddress = (size_t)_writeAddress;
-    if (nextAddress % PAGE_SIZE == 0) {
-      eraseFlash(nextAddress, PAGE_SIZE, PAGE_SIZE);
-    }
   }
 
   return 1;
