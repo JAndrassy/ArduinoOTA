@@ -63,7 +63,7 @@ extern "C" {
     while (NRF_NVMC->READY == NVMC_READY_READY_Busy);
 #endif
   }
-  
+
 #if defined(__SAMD51__)
 // Invalidate all CMCC cache entries if CMCC cache is enabled.
   __attribute__ ((long_call, noinline, section (".data#")))
@@ -94,7 +94,7 @@ extern "C" {
     for (int i = 0; i < length; i += rowSize) {
       NVMCTRL->ADDR.reg = ((uint32_t)(address + i)) / 2;
       NVMCTRL->CTRLA.reg = NVMCTRL_CTRLA_CMDEX_KEY | NVMCTRL_CTRLA_CMD_ER;
-      
+
       waitForReady();
     }
 #elif defined(ARDUINO_ARCH_NRF5)
@@ -113,7 +113,7 @@ extern "C" {
     waitForReady();
     NRF_NVMC->CONFIG = NVMC_CONFIG_WEN_Wen << NVMC_CONFIG_WEN_Pos;
     waitForReady();
-#endif    
+#endif
   }
 
   __attribute__ ((long_call, noinline, section (".data#")))
@@ -156,7 +156,10 @@ int InternalStorageClass::open(int length)
   NVMCTRL->CTRLB.bit.MANW = 0;
 #endif
 
+#if !defined(ARDUINO_ARCH_NRF5)
+  // Erase all pages
   eraseFlash(STORAGE_START_ADDRESS, pageAlignedLength, PAGE_SIZE);
+#endif
 
   return 1;
 }
@@ -168,6 +171,13 @@ size_t InternalStorageClass::write(uint8_t b)
 
   if (_writeIndex == 4) {
     _writeIndex = 0;
+
+#if defined(ARDUINO_ARCH_NRF5)
+    // Erase a single page if needed
+    if ((int)(_writeAddress) % PAGE_SIZE == 0) {
+      eraseFlash((int)_writeAddress, PAGE_SIZE, PAGE_SIZE);
+    }
+#endif
 
     *_writeAddress = _addressData.u32;
 
@@ -184,6 +194,10 @@ void InternalStorageClass::close()
   while ((int)_writeAddress % PAGE_SIZE) {
     write(0xff);
   }
+
+  // Re-calculate pageAlignedLength in case the actually written binary
+  // is smaller then the size provided in open()
+  pageAlignedLength = (_writeAddress - (uint32_t*)STORAGE_START_ADDRESS) * sizeof(uint32_t);
 }
 
 void InternalStorageClass::clear()
