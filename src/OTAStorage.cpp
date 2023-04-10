@@ -47,7 +47,7 @@ OTAStorage::OTAStorage() :
         PAGE_SIZE(4), //for FLASH_TYPEPROGRAM_WORD
 #endif
         MAX_FLASH((min(LL_GetFlashSize(), 512ul) * 1024)) // LL_GetFlashSize returns size in kB. 512 is max for a bank
-#elif defined(ARDUINO_ARCH_RP2040)
+#elif defined(ARDUINO_ARCH_RP2040) && !defined(ARDUINO_ARCH_MBED)
         SKETCH_START_ADDRESS(0),
         PAGE_SIZE(FLASH_PAGE_SIZE),
         MAX_FLASH((uint32_t) min(&_FS_start, &_EEPROM_start) - XIP_BASE)

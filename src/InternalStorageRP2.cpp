@@ -17,7 +17,7 @@
 
  */
 
-#if defined(ARDUINO_ARCH_RP2040)
+#if defined(ARDUINO_ARCH_RP2040) && !defined(ARDUINO_ARCH_MBED)
 
 #include <Arduino.h>
 
