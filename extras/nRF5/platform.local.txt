@@ -1,9 +1,19 @@
 
+# This configuration file supports the general ArduinoOTA library https://github.com/jandrassy/ArduinoOTA
+
 compiler.cpp.extra_flags=-fno-delete-null-pointer-checks
 
+#IDE 1
 tools.openocd.network_cmd={runtime.tools.arduinoOTA.path}/bin/arduinoOTA
 tools.openocd.upload.network_pattern="{network_cmd}" -address {serial.port} -port 65280 -username arduino -password "{network.password}" -sketch "{build.path}/{build.project_name}.bin" -upload /sketch -b
 
+#IDE 2
+tools.arduino_ota.cmd={runtime.tools.arduinoOTA.path}/bin/arduinoOTA
+tools.arduino_ota.upload.field.password=Password
+tools.arduino_ota.upload.field.password.secret=true
+tools.arduino_ota.upload.pattern="{cmd}" -address {serial.port} -port 65280 -username arduino -password "{upload.field.password}" -sketch "{build.path}/{build.project_name}.bin" -upload /sketch -b
+
+## arduinoOTA as programmer. add entries with {ip} into programmers.txt
 tools.arduinoOTA.cmd={runtime.tools.arduinoOTA.path}/bin/arduinoOTA
 tools.arduinoOTA.program.params.verbose=
 tools.arduinoOTA.program.params.quiet=
