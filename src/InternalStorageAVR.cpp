@@ -31,9 +31,11 @@ InternalStorageAVRClass::InternalStorageAVRClass() {
 }
 
 int InternalStorageAVRClass::open(int length) {
-  (void)length;
-  pageAddress = maxSketchSize;
-  pageIndex = 0;
+  if (length < 0) {
+    return 0;
+  }
+  pageAddress = maxSketchSize + length / SPM_PAGESIZE;
+  pageIndex = length % SPM_PAGESIZE;
   return 1;
 }
 
