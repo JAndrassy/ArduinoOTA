@@ -203,6 +203,7 @@ Does the OTA uploaded sketch have ArduinoOTA?
 * STM32
     - BluePill F103CB (128kB flash)
     - BlackPill F411CE
+    - [NUCLEO-F303RE](https://github.com/JAndrassy/ArduinoOTA/issues/203)  
 * nRF5
     - Seeed Arch Link (nRF51 board)
     - [nrf52832 board](https://github.com/jandrassy/ArduinoOTA/issues/1)
