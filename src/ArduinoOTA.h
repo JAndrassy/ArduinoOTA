@@ -108,6 +108,10 @@ public:
     WiFiOTAClass::pollMdns(mdnsSocket);
   }
 
+  void handle() { // alias
+    poll();
+  }
+
 };
 
 #if defined(NO_OTA_NETWORK)
