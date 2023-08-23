@@ -1,5 +1,5 @@
 
-# Arduino library to update the sketch over the network to a supported Arduino board
+# Arduino library to update the sketch over the network
 
 This library allows you to update sketches on your board over WiFi or Ethernet.
 
@@ -51,13 +51,15 @@ Note for platformio users: Please, don't use this library with platformio. It wa
 
 Arduino SAMD boards (Zero, M0, MKR, Nano 33 IoT) are supported 'out of the box'. Additionally to upload over the internal flash as temporary storage, upload over SD card and over MEM shield's flash is possible. For upload over SD card use the SDU library as shown in the WiFi101_SD_OTA or similar for upload over MKR MEM shield use the SFU library.
 
-For Uno R4, RP2040, nRF5 and STM32F1 boards, platform.local.txt from extras folder has to be copied into boards package installation folder. For nRF5 details scroll down.
+For Uno R4, RP2040, nRF5 and STM32 boards, platform.local.txt from extras folder has to be copied into boards package installation folder. For nRF5 details scroll down. For RP2040 the bundled ArduinoOTA library must be deleted.
 
 For ESP8266 and ESP32 boards, platform.local.txt from extras folder has to be copied into boards package installation folder and the bundled ArduinoOTA library must be deleted. For details scroll down.
 
 ATmega boards require to flash a modified Optiboot bootloader for flash write operations. Details are below.
 
 For other MCU upload over SD card is possible if the MCU has SD bootloader which can bootload the update bin from SD card. See the ATmega-SD example. Some MCU can use a second stage SD bootloader linked to the sketch as a library similar to SAMD package's SDU library.
+
+With InternalStorage the sketch binary size is limited to half of the available flash memory size. The available flash size may be reduced by the bootloader and EEPROM emulation space.
 
 For upload the 'OTA programmer' technique can be configured.
 
@@ -83,7 +85,9 @@ Important! If you test OTA with the 'fake' programmer, close the Serial Monitor 
 
 ## OTA update as download
 
-*Note: Don't use this for esp8266 and esp32 Arduino. Use the ESP8266httpUpdate and the esp32 HTTPUpdate library for OTA update download for esp8266/esp32. Or use the Update object from esp8266 core ot the Update library directly.*
+*Note: For Arduino MKR WiFi 1010 and Arduino Nano 33 IoT the SNU library and storage support in the nina firmware can be used for OTA update as download. See the SNU library example in the IDE Examples menu.*
+
+*Note: Don't use this for esp8266 and esp32 Arduino. Use the ESP8266httpUpdate and the esp32 HTTPUpdate library for OTA update download for esp8266/esp32. Or use the Update object from esp8266 core of the Update library directly.*
 
 The WiFi101OTA and ArduinoOTA libraries were created for upload from IDE. But in some scenarios as for example deployed sleeping battery powered devices it is better to have the update available for download by the device.
 
@@ -177,7 +181,7 @@ The wrong upload command from AVR boards platform.txt is used. Did you copy `ext
 
 The final loading of the uploaded binary is in some cases not under control of the ArduinoOTA library. 
 
-For SD card way the SD bootloader or the SDU library is responsible for loading the new binary. So SD bootloader must be present and in case of SDU, the uploaded sketch must contain the SDU library.
+For SD card way the SD bootloader or the SDU library is responsible for loading the new binary. So SD bootloader must be present and in case of SDU, the uploaded sketch must contain the SDU library. Note that other SPI devices may disturb access to the SD card from the bootloader/SDU. Make sure there are pull-up resistors on the CS pins.
 
 For AVR InternalStorage upload the final loading is done by the Optiboot with `copy_flash_pages` function. Optiboot 8 without `copy_flash_pages` will successfully store the binary to upper half of the flash but will not copy it to run location in flash. 
 
