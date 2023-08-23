@@ -2,6 +2,7 @@
 # This configuration file supports the general ArduinoOTA library https://github.com/jandrassy/ArduinoOTA
 # with Arduino IDE 2
 
+upload.tool.network=arduino_ota
 tools.arduino_ota.cmd={runtime.tools.arduinoOTA.path}/bin/arduinoOTA
 tools.arduino_ota.upload.field.password=Password
 tools.arduino_ota.upload.field.password.secret=true

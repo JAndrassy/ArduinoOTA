@@ -8,6 +8,7 @@ tools.avrdude.network_cmd={runtime.tools.arduinoOTA.path}/bin/arduinoOTA
 tools.avrdude.upload.network_pattern="{network_cmd}" -address {serial.port} -port 65280 -username arduino -password "{network.password}" -sketch "{build.path}/{build.project_name}.bin" -upload /sketch -b
 
 #IDE 2
+upload.tool.network=arduino_ota
 tools.arduino_ota.cmd={runtime.tools.arduinoOTA.path}/bin/arduinoOTA
 tools.arduino_ota.upload.field.password=Password
 tools.arduino_ota.upload.field.password.secret=true
