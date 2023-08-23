@@ -22,6 +22,9 @@ extern "C" char * g_pfnVectors; // at first address of the binary. 0x0000 withou
 #include <hardware/flash.h>
 extern "C" uint8_t _FS_start;
 extern "C" uint8_t _EEPROM_start;
+#elif defined(ARDUINO_ARCH_RENESAS_UNO)
+#include <r_flash_lp.h>
+extern "C" uint8_t __ROM_Start;
 #elif defined(ARDUINO_ARCH_MEGAAVR)
 #include <avr/wdt.h>
 #elif defined(__AVR__)
@@ -51,6 +54,10 @@ OTAStorage::OTAStorage() :
         SKETCH_START_ADDRESS(0),
         PAGE_SIZE(FLASH_PAGE_SIZE),
         MAX_FLASH((uint32_t) min(&_FS_start, &_EEPROM_start) - XIP_BASE)
+#elif defined(ARDUINO_ARCH_RENESAS_UNO)
+        SKETCH_START_ADDRESS((uint32_t)(&__ROM_Start)),
+        PAGE_SIZE(BSP_FEATURE_FLASH_LP_CF_BLOCK_SIZE),
+        MAX_FLASH(BSP_ROM_SIZE_BYTES)
 #elif defined(__AVR__) && !defined(ARDUINO_ARCH_MEGAAVR)
         SKETCH_START_ADDRESS(0),
         PAGE_SIZE(SPM_PAGESIZE),

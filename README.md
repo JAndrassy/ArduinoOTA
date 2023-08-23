@@ -25,6 +25,7 @@ The library is a modification of the Arduino WiFi101OTA library.
 
 * classic ATmega AVR with at least 64 kB of flash (Arduino Mega, [MegaCore](https://github.com/MCUdude/MegaCore) MCUs, MightyCore 1284p and 644)
 * Arduino SAMD boards like Zero, M0, MKR and Nano 33 IoT
+* Arduino Uno R4 boards 
 * nRF5 board supported by [nRF5 core](https://github.com/sandeepmistry/arduino-nRF5).
 * RP2040 boards with [Pico core](https://github.com/earlephilhower/arduino-pico)
 * STM32F boards with [STM32 core](https://github.com/stm32duino/Arduino_Core_STM32)
@@ -36,6 +37,7 @@ The library is a modification of the Arduino WiFi101OTA library.
 * Ethernet library - Ethernet shields and modules with Wiznet 5100, 5200 and 5500 chips
 * WiFi101 - MKR 1000, Arduino WiFi101 shield and Adafruit WINC1500 WiFi shield or module
 * WiFiNINA - MKR 1010, MKR 4000, Nano 33 IoT and any supported MCU with attached ESP32 as SPI network adapter with WiFiNINA firmware
+* WiFiS3 library of Arduino Uno R4 WiFi
 * WiFiEspAT - esp8266 or ESP32 as network adapter with AT firmware
 * EthernetENC - shields and modules with ENC28j60 chip
 
@@ -49,7 +51,7 @@ Note for platformio users: Please, don't use this library with platformio. It wa
 
 Arduino SAMD boards (Zero, M0, MKR, Nano 33 IoT) are supported 'out of the box'. Additionally to upload over the internal flash as temporary storage, upload over SD card and over MEM shield's flash is possible. For upload over SD card use the SDU library as shown in the WiFi101_SD_OTA or similar for upload over MKR MEM shield use the SFU library.
 
-For RP2040, nRF5 and STM32F1 boards, platform.local.txt from extras folder has to be copied into boards package installation folder. For nRF5 details scroll down.
+For Uno R4, RP2040, nRF5 and STM32F1 boards, platform.local.txt from extras folder has to be copied into boards package installation folder. For nRF5 details scroll down.
 
 For ESP8266 and ESP32 boards, platform.local.txt from extras folder has to be copied into boards package installation folder and the bundled ArduinoOTA library must be deleted. For details scroll down.
 
@@ -71,7 +73,7 @@ Example OTA 'programmer' configuration in programmers.txt:
 ```
 arduinoOTA104.name=Arduino OTA (192.168.1.104)
 arduinoOTA104.program.tool=arduinoOTA
-arduinoOTA104.program.default=arduinoOTA
+arduinoOTA104.program.tool.default=arduinoOTA
 arduinoOTA104.ip=192.168.1.104
 ``` 
 
@@ -143,8 +145,8 @@ In some networks or on some computers UDP mDNS doesn't work. You can still use t
 
 It is possible to suppress use of the mDNS service by the library. Only define NO_OTA_PORT before the include like this: 
 ```
-#define NO_OTA_PORT
-#include <ArduinoOTA.h>
+ #define NO_OTA_PORT
+ #include <ArduinoOTA.h>
 ```
 
 ## Troubleshooting
@@ -197,6 +199,8 @@ Does the OTA uploaded sketch have ArduinoOTA?
     - [Adafruit Feather M0 Express](https://github.com/jandrassy/ArduinoOTA/discussions/77)
 * SAMD51
     - [Seeed Wio Terminal](https://github.com/jandrassy/ArduinoOTA/pull/104) (with Blynk.Edgent)
+* Renesas core
+    - Uno R4 WiFi
 * RP2040
     - Raspberry Pi Pico
     - Arduino RP2040 Connect

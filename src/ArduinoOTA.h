@@ -29,6 +29,8 @@
 #include <InternalStorageSTM32.h>
 #elif defined(ARDUINO_ARCH_RP2040)
 #include <InternalStorageRP2.h>
+#elif defined(ARDUINO_ARCH_RENESAS_UNO)
+#include <InternalStorageRenesas.h>
 #elif defined(ESP8266) || defined(ESP32)
 #include "InternalStorageESP.h"
 #else
@@ -126,7 +128,7 @@ ArduinoOTAMdnsClass  <EthernetServer, EthernetClient, EthernetUDP>   ArduinoOTA;
 #elif defined(UIPETHERNET_H) // no UDP multicast implementation yet
 ArduinoOTAClass  <EthernetServer, EthernetClient>   ArduinoOTA;
 
-#elif defined(WiFiNINA_h) || defined(WIFI_H) || defined(ESP8266) || defined(ESP32) || defined(ARDUINO_RASPBERRY_PI_PICO_W) // NINA, WiFi101 and Espressif WiFi
+#elif defined(WiFiNINA_h) || defined(WIFI_H)  || defined(WiFiS3_h) || defined(ESP8266) || defined(ESP32) || defined(ARDUINO_RASPBERRY_PI_PICO_W) // NINA, WiFi101 and Espressif WiFi
 #ifdef NO_OTA_PORT
 ArduinoOTAClass  <WiFiServer, WiFiClient> ArduinoOTA;
 #else

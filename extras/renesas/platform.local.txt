@@ -1,0 +1,22 @@
+
+# This configuration file supports the general ArduinoOTA library https://github.com/jandrassy/ArduinoOTA
+
+#IDE 1
+tools.bossac.network_cmd={runtime.tools.arduinoOTA.path}/bin/arduinoOTA
+tools.bossac.upload.network_pattern="{network_cmd}" -address {serial.port} -port 65280 -username arduino -password "{network.password}" -sketch "{build.path}/{build.project_name}.bin" -upload /sketch -b
+
+tools.dfu-util.network_cmd={runtime.tools.arduinoOTA.path}/bin/arduinoOTA
+tools.dfu-util.upload.network_pattern="{network_cmd}" -address {serial.port} -port 65280 -username arduino -password "{network.password}" -sketch "{build.path}/{build.project_name}.bin" -upload /sketch -b
+
+#IDE 2
+upload.tool.network=arduino_ota
+tools.arduino_ota.cmd={runtime.tools.arduinoOTA.path}/bin/arduinoOTA
+tools.arduino_ota.upload.field.password=Password
+tools.arduino_ota.upload.field.password.secret=true
+tools.arduino_ota.upload.pattern="{cmd}" -address "{upload.port.address}" -port 65280 -username arduino -password "{upload.field.password}" -sketch "{build.path}/{build.project_name}.bin" -upload /sketch -b
+
+## arduinoOTA as programmer. add entries with {ip} into programmers.txt
+tools.arduinoOTA.cmd={runtime.tools.arduinoOTA.path}/bin/arduinoOTA
+tools.arduinoOTA.program.params.verbose=
+tools.arduinoOTA.program.params.quiet=
+tools.arduinoOTA.program.pattern="{cmd}" -v -address {ip} -port 65280 -username arduino -password password -sketch "{build.path}/{build.project_name}.bin" -upload /sketch -b
