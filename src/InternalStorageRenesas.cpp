@@ -26,7 +26,6 @@ extern "C" {
 #include "utility/r_flash_lp_cf.h"
 }
 
-const flash_api_t& flash = g_flash_on_flash_lp;
 static flash_lp_instance_ctrl_t flashCtrl;
 static flash_cfg_t flashCfg;
 
@@ -97,7 +96,7 @@ int InternalStorageRenesasClass::open(int length) {
   flashWriteAddress = storageStartAddress;
   writeIndex = 0;
 
-  fsp_err_t rv = flash.open(&flashCtrl, &flashCfg);
+  fsp_err_t rv = R_FLASH_LP_Open(&flashCtrl, &flashCfg);
   if (rv != FSP_SUCCESS)
     return 0;
 
@@ -130,11 +129,11 @@ void InternalStorageRenesasClass::close() {
   while (writeIndex) {
     write(0xff);
   }
-  flash.close(&flashCtrl);
+  R_FLASH_LP_Close(&flashCtrl);
 }
 
 void InternalStorageRenesasClass::apply() {
-  fsp_err_t rv = flash.open(&flashCtrl, &flashCfg);
+  fsp_err_t rv = R_FLASH_LP_Open(&flashCtrl, &flashCfg);
   if (rv != FSP_SUCCESS)
     return;
   __disable_irq();
