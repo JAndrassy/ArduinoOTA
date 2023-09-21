@@ -62,10 +62,10 @@ public:
   }
 
   void end() {
-#if defined(ESP8266) || defined(ESP32)
-    server.stop();
-#elif defined(_WIFI_ESP_AT_H_)
+#if defined(_WIFI_ESP_AT_H_)|| defined(WiFiS3_h) || defined(ESP32) || defined(UIPETHERNET_H)
     server.end();
+#elif defined(ESP8266)
+    server.stop();
 #else
 //#warning "The networking library doesn't have a function to stop the server"
 #endif
