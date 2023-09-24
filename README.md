@@ -31,6 +31,8 @@ The library is a modification of the Arduino WiFi101OTA library.
 * STM32F boards with [STM32 core](https://github.com/stm32duino/Arduino_Core_STM32)
 * boards supported by ESP8266 and ESP32 Arduino boards package  
 * any board with MCU with SD bootloader
+* any board with custom Storage and boot-load solution for that storage
+* Nano RP2040 Connect with mbed core with custom storage example and SFU library
 
 ## Supported networking libraries
 
@@ -156,6 +158,11 @@ It is possible to suppress use of the mDNS service by the library. Only define N
 ## Troubleshooting
 
 To see the details of upload command in IDE, set verbose mode for upload in IDE Preferences. arduinoOTA tool version should be 1.2 or higher.
+
+### Compilation errors
+
+* undefined reference to `InternalStorage' - make sure you selected a board supported by the ArduinoOTA library
+* 'ArduinoOTA' was not declared in this scope - make sure a networking library is included before the ArduinoOTA.h include
 
 ### No OTA network port in IDE tools menu
 
