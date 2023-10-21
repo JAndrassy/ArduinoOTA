@@ -42,6 +42,7 @@ The library is a modification of the Arduino WiFi101OTA library.
 * WiFiS3 library of Arduino Uno R4 WiFi
 * WiFiEspAT - esp8266 or ESP32 as network adapter with AT firmware
 * EthernetENC - shields and modules with ENC28j60 chip
+* WiFi library of the Pico Core including its Ethernet network interfaces
 
 EthernetENC library doesn't support UDP multicast for MDNS, so Arduino IDE will not show the network upload port.
 

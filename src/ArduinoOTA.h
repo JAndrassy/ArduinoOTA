@@ -64,7 +64,7 @@ public:
   void end() {
 #if defined(_WIFI_ESP_AT_H_)|| defined(WiFiS3_h) || defined(ESP32) || defined(UIPETHERNET_H)
     server.end();
-#elif defined(ESP8266)
+#elif defined(ESP8266) || (defined(ARDUINO_ARCH_RP2040) && !defined(ARDUINO_ARCH_MBED))
     server.stop();
 #else
 //#warning "The networking library doesn't have a function to stop the server"
@@ -128,7 +128,7 @@ ArduinoOTAMdnsClass  <EthernetServer, EthernetClient, EthernetUDP>   ArduinoOTA;
 #elif defined(UIPETHERNET_H) // no UDP multicast implementation yet
 ArduinoOTAClass  <EthernetServer, EthernetClient>   ArduinoOTA;
 
-#elif defined(WiFiNINA_h) || defined(WIFI_H)  || defined(WiFiS3_h) || defined(ESP8266) || defined(ESP32) || defined(ARDUINO_RASPBERRY_PI_PICO_W) // NINA, WiFi101 and Espressif WiFi
+#elif defined(WiFiNINA_h) || defined(WIFI_H)  || defined(WiFiS3_h) || defined(ESP8266) || defined(ESP32) // NINA, WiFi101 and Espressif WiFi
 #ifdef NO_OTA_PORT
 ArduinoOTAClass  <WiFiServer, WiFiClient> ArduinoOTA;
 #else
@@ -144,6 +144,14 @@ ArduinoOTAClass  <WiFiServer, WiFiClient> ArduinoOTA;
 
 #elif defined(_WIFISPI_H_INCLUDED) // no UDP multicast implementation
 ArduinoOTAClass  <WiFiSpiServer, WiFiSpiClient> ArduinoOTA;
+
+#elif defined(ARDUINO_ARCH_RP2040) && !defined(ARDUINO_ARCH_MBED)
+#ifdef NO_OTA_PORT
+ArduinoOTAClass  <WiFiServer, WiFiClient> ArduinoOTA;
+#else
+#include <WiFiUdp.h>
+ArduinoOTAMdnsClass <WiFiServer, WiFiClient, WiFiUDP> ArduinoOTA;
+#endif
 
 #else
 #warning "Network library not included or not supported"
