@@ -20,9 +20,11 @@
   based on Juraj Andrassy sample sketch 'OTASketchDownload'
 */
 
-#include <ArduinoOTA.h> // only for InternalStorage
 #include <WiFiNINA.h>
 #include <ArduinoHttpClient.h>
+
+#define NO_OTA_NETWORK
+#include <ArduinoOTA.h> // only for InternalStorage
 
 // Please enter your WiFi sensitive data in the arduino_secrets.h file
 #include "arduino_secrets.h"

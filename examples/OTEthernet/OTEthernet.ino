@@ -19,6 +19,7 @@
  
 #include <SPI.h>
 #include <Ethernet.h>
+#define OTETHERNET
 #include <ArduinoOTA.h>
 
 //#define Serial SerialUSB

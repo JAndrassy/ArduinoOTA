@@ -36,6 +36,9 @@ The library is a modification of the Arduino WiFi101OTA library.
 
 ## Supported networking libraries
 
+The ArduinoOTA library will work any proper Arduino Ethernet or WiFi library. For Ethernet library add `#define OTETHERNET` before including the ArduinoOTA library. If you don't want a network port or the library doesn't support it, add `#define NO_OTA_PORT` before including the ArduinoOTA library. If you only want to use InternalStorage without the network upload from IDE, add `#define NO_OTA_NETWORK` before including the ArduinoOTA library.
+
+Tested libraries are:
 * Ethernet library - Ethernet shields and modules with Wiznet 5100, 5200 and 5500 chips
 * WiFi101 - MKR 1000, Arduino WiFi101 shield and Adafruit WINC1500 WiFi shield or module
 * WiFiNINA - MKR 1010, MKR 4000, Nano 33 IoT and any supported MCU with attached ESP32 as SPI network adapter with WiFiNINA firmware
@@ -44,7 +47,7 @@ The library is a modification of the Arduino WiFi101OTA library.
 * EthernetENC - shields and modules with ENC28j60 chip
 * WiFi library of the Pico Core including its Ethernet network interfaces
 
-EthernetENC library doesn't support UDP multicast for MDNS, so Arduino IDE will not show the network upload port.
+EthernetENC and WiFiEspAT with esp8266 doesn't support UDP multicast for MDNS, so Arduino IDE will not show the network upload port.
 
 ## Installation
 
@@ -68,7 +71,7 @@ For upload the 'OTA programmer' technique can be configured.
 
 ## OTA Upload from IDE without 'network port'
 
-Some of the supported networking libraries don't have the UDP.beginMulticast function and can't start a MDNS service to propagate the network port for Arduino IDE. And sometimes the MDNS port is not detected for the good libraries too. Arduino IDE doesn't yet allow to enter the IP address. 
+Some networking libraries don't have the UDP.beginMulticast function and can't start a MDNS service to propagate the network port for Arduino IDE. And sometimes the MDNS port is not detected for the good libraries too. Arduino IDE doesn't yet allow to enter the IP address. 
 
 The workaround is to configure a fake programmer for Arduino OTA. You can use [my_boards](https://github.com/jandrassy/my_boards) as starting point. For Arduino Mega it is the best option for all ArduinoOTA aspects, for other boards it gives you control about your custom settings. In your copy of my_boards in programmers.txt, configure the IP address and restart the IDE. Note: the esp boards packages can't be used as referenced packages in my_boards style.
 

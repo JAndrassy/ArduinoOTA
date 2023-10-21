@@ -20,6 +20,7 @@
 #include <SPI.h>
 #include <SD.h>
 #include <Ethernet.h>
+#define OTETHERNET
 #include <ArduinoOTA.h>
 #include <SDU.h>
 

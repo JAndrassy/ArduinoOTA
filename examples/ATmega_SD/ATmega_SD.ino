@@ -20,6 +20,7 @@
 #include <SPI.h>
 #include <SD.h>
 #include <Ethernet.h>
+#define OTETHERNET
 #include <ArduinoOTA.h>
 
 // Enter a MAC address for your controller below.

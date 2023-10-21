@@ -10,6 +10,7 @@
  by Juraj Andrassy
  */
 
+#define NO_OTA_NETWORK
 #include <ArduinoOTA.h> // include before SD.h (to not intialize SDStorage)
 #include <SD.h>
 #include "kk_ihex_read.h"

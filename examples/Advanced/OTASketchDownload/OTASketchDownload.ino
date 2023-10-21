@@ -16,9 +16,11 @@
  by Juraj Andrassy
  */
 
-#include <ArduinoOTA.h> // only for InternalStorage
 #include <Ethernet.h>
 #include <ArduinoHttpClient.h>
+
+#define NO_OTA_NETWORK
+#include <ArduinoOTA.h> // only for InternalStorage
 
 const short VERSION = 1;
 
