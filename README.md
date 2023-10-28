@@ -107,7 +107,7 @@ The sizes of networking library and the SD library allows the use of ArduinoOTA 
 
 *Side note: There are other network upload options for here excluded ATmega328p: ([Ariadne bootloader](https://github.com/loathingKernel/ariadne-bootloader) for Wiznet chips, [WiFiLink firmware](https://github.com/jandrassy/arduino-firmware-wifilink) for the esp8266) or [AvrDudeTelnet](https://github.com/jandrassy/lab/blob/master/AvrDudeTelnet/AvrDudeTelnet.ino) upload (Linux only).*
 
-For upload with ArduinoOTA library over InternalStorage, Optiboot bootloader with [`copy_flash_pages` function](https://github.com/Optiboot/optiboot/pull/269) is required. MegaCore and MightyCore by [MCUDude](https://github.com/MCUdude) have Optiboot binaries with `copy_flash_pages` function ready to be burn to your ATmega.
+For upload with ArduinoOTA library over InternalStorage, Optiboot bootloader with [`copy_flash_pages` function](https://github.com/Optiboot/optiboot/pull/269) is required. MegaCore and MightyCore by [MCUDude](https://github.com/MCUdude) before version 3 has Optiboot binaries with `copy_flash_pages` function ready to be burn to your ATmega.
 
 The most common Arduino ATmega board with more than 64 kB of flash memory is Arduino Mega. To use it with ArduinoOTA library, you can't use it directly with the Arduino AVR package, because the package doesn't have the right fuse settings for Mega with Optiboot. You can download [my boards definitions](https://github.com/jandrassy/my_boards) and use it [to burn](https://arduino.stackexchange.com/questions/473/how-do-i-burn-the-bootloader) the modified Optiboot and to upload sketches to your Mega over USB and over network. 
 
