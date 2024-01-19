@@ -69,6 +69,8 @@ With InternalStorage the sketch binary size is limited to half of the available 
 
 For upload the 'OTA programmer' technique can be configured.
 
+The upload tool in IDE gas a timeout 10 seconds. For some sketch size, MCU or library it is too short. To set longer timeout, [download](https://github.com/arduino/arduinoOTA/releases) newer version of the tool, replace the 1.3.0 arduinoOTA executable and in platform.local.txt add the -t option in seconds.
+
 ## OTA Upload from IDE without 'network port'
 
 Some networking libraries don't have the UDP.beginMulticast function and can't start a MDNS service to propagate the network port for Arduino IDE. And sometimes the MDNS port is not detected for the good libraries too. Arduino IDE doesn't yet allow to enter the IP address. 
@@ -187,6 +189,13 @@ platform.txt in my_boards and the fake programmer tool definition in platform.lo
 ### arduinoOTA tool returns "Failed to reset the board, upload failed"
 
 The wrong upload command from AVR boards platform.txt is used. Did you copy `extras/avr/platform.local.txt` next to platform.txt as required?
+
+### Upload fails after 10 seconds
+
+If upload fails with `Flashing sketch ... Error flashing the sketch` after 10 seconds, the problem is the 10 seconds timeout of IDE's upload tool.
+
+To set longer timeout, [download](https://github.com/arduino/arduinoOTA/releases) newer version of the tool, replace the 1.3.0 arduinoOTA executable and in platform.local.txt add the -t option in seconds.
+
 
 ### Upload returns OK but the sketch is not replaced.
 
