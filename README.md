@@ -47,7 +47,7 @@ Tested libraries are:
 * EthernetENC - shields and modules with ENC28j60 chip
 * WiFi library of the Pico Core including its Ethernet network interfaces
 
-EthernetENC and WiFiEspAT with esp8266 doesn't support UDP multicast for MDNS, so Arduino IDE will not show the network upload port.
+EthernetENC and WiFiEspAT doesn't support UDP multicast for MDNS, so Arduino IDE will not show the network upload port.
 
 ## Installation
 
@@ -123,7 +123,11 @@ The IDE upload tool is installed with Arduino AVR core package. At least version
 
 This library allows to upload a sketch to esp8266 or esp32 over Ethernet with Ethernet or EthernetENC library.
 
-*Note: Both esp8266 and esp32 Arduino core now support wired Ethernet as additional network interface for their WiFi library (STA and SoftAP are the 'built-in' network interfaces). With Ethernet over WiFi library you can use the standard OTA upload of the esp8266 and esp32 core with wired Ethernet.*
+*Both esp8266 and esp32 Arduino core now support wired network as additional network interface for their networking (STA and SoftAP are the 'built-in' network interfaces). With their Ethernet libraries you can use the standard OTA upload of the esp8266 and esp32 platform with wired network.*
+
+*With esp8266 platform's lwIP_xy libraries (optionally with the EtherCompat.h) you can use W5500, W5100 and ENC28J60 wired network.*
+
+*With esp32 platform version 3 you can use the EthernetESP32 library (available in Library Manager) with a variety of Ethernet modules including W5500 and ENC28J60. See the BasicOTA example in the EthernetESP32 library,*
 
 To use this library instead of the bundled library, the bundled library must be removed from the boards package library folder. To override the configuration of OTA upload in platform.txt, copy the platform.local.txt file from extras folder of this library next to platform.txt file in boards package installation folder. For Arduino IDE 2 use platform.local.txt from extras/IDE2.
 
