@@ -36,7 +36,7 @@ The library is a modification of the Arduino WiFi101OTA library.
 
 ## Supported networking libraries
 
-The ArduinoOTA library will work any proper Arduino Ethernet or WiFi library. For Ethernet library add `#define OTETHERNET` before including the ArduinoOTA library. If you don't want a network port or the library doesn't support it, add `#define NO_OTA_PORT` before including the ArduinoOTA library. If you only want to use InternalStorage without the network upload from IDE, add `#define NO_OTA_NETWORK` before including the ArduinoOTA library.
+The ArduinoOTA library will work with any proper Arduino Ethernet or WiFi library. For Ethernet library add `#define OTETHERNET` before including the ArduinoOTA library. If you don't want a network port or the library doesn't support it, add `#define NO_OTA_PORT` before including the ArduinoOTA library. If you only want to use InternalStorage without the network upload from IDE, add `#define NO_OTA_NETWORK` before including the ArduinoOTA library.
 
 Tested libraries are:
 * Ethernet library - Ethernet shields and modules with Wiznet 5100, 5200 and 5500 chips
@@ -223,10 +223,11 @@ Does the OTA uploaded sketch have ArduinoOTA?
     - Crowduino M0 SD
     - Arduino Nano 33 IoT
     - Arduino MKR WiFi 1000
-    - [Arduino MKR WiFi 1010](https://github.com/jandrassy/ArduinoOTA/issues/46)
+    - Arduino MKR WiFi 1010
     - [Adafruit Feather M0 Express](https://github.com/jandrassy/ArduinoOTA/discussions/77)
 * SAMD51
     - [Seeed Wio Terminal](https://github.com/jandrassy/ArduinoOTA/pull/104) (with Blynk.Edgent)
+    - Adafruit ItsyBitsy M4
 * Renesas core
     - Uno R4 WiFi
 * RP2040
