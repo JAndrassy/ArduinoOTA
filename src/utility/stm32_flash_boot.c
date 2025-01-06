@@ -19,18 +19,9 @@
 #ifdef ARDUINO_ARCH_STM32
 
 #include "stm32_flash_boot.h"
-#if defined(STM32F0xx)
-#include <stm32f0xx_hal_flash_ex.h> // FLASH_PAGE_SIZE is in hal.h
-#elif defined(STM32F1xx)
-#include <stm32f1xx_hal_flash_ex.h> // FLASH_PAGE_SIZE is in hal.h
-#elif defined(STM32F2xx)
-#include <stm32f2xx.h>
-#elif defined(STM32F3xx)
-#include <stm32f3xx_hal_flash_ex.h> // FLASH_PAGE_SIZE is in hal.h
-#elif defined(STM32F4xx)
-#include "stm32f4xx.h"
-#elif defined(STM32F7xx)
-#include <stm32f7xx.h>
+#include "stm32_def.h" // To get FLASH_PAGE_SIZE
+
+#if defined(STM32F7xx)
 #define SMALL_SECTOR_SIZE 0x8000 // sectors 0 to 3
 #define LARGE_SECTOR_SIZE 0x40000 // from sector 5
 #endif
