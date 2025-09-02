@@ -89,6 +89,8 @@ void ExternalOTAStorage::apply() {
   while (true);
 #elif defined(ESP8266) || defined(ESP32)
   ESP.restart();
+#elif defined(ARDUINO_ARCH_RP2040) && !defined(ARDUINO_ARCH_MBED)
+  rp2040.reboot();
 #else
   NVIC_SystemReset();
 #endif
