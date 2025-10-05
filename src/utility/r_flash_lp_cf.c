@@ -18,7 +18,7 @@
  * OF SUCH LOSS, DAMAGES, CLAIMS OR COSTS.
  **********************************************************************************************************************/
 
-#ifdef ARDUINO_ARCH_RENESAS_UNO
+#ifdef ARDUINO_ARCH_RENESAS
 
 #include "r_flash_lp_cf.h"
 

@@ -29,7 +29,7 @@
 #include <InternalStorageSTM32.h>
 #elif defined(ARDUINO_ARCH_RP2040)
 #include <InternalStorageRP2.h>
-#elif defined(ARDUINO_ARCH_RENESAS_UNO)
+#elif defined(ARDUINO_ARCH_RENESAS) 
 #include <InternalStorageRenesas.h>
 #elif defined(ESP8266) || defined(ESP32)
 #include "InternalStorageESP.h"
