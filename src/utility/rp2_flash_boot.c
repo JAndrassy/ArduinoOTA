@@ -22,7 +22,7 @@
 
 #include <hardware/flash.h>
 #include <pico/bootrom.h>
-#include <RP2040.h> // CMSIS
+#include <hardware/watchdog.h>
 #include <hardware/structs/ssi.h> // XIP_BASE defintion
 
 // boot2 functions copied from hardware/flash.c
@@ -90,7 +90,7 @@ void __no_inline_not_in_flash_func(copy_flash_pages)(uint32_t flash_offs, const 
       count -= FLASH_PAGE_SIZE;
     }
     if (reset) {
-      NVIC_SystemReset();
+      watchdog_reboot(0, 0, 0);
     }
 }
 
