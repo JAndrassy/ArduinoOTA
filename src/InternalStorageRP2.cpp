@@ -79,7 +79,7 @@ size_t InternalStorageRP2Class::write(uint8_t b) {
 
 void InternalStorageRP2Class::close() {
   if (pageBufferIndex > 0) {
-    memset(pageBuffer + pageBufferIndex, PAGE_SIZE - pageBufferIndex, 0xFF);
+    memset(pageBuffer + pageBufferIndex, 0xFF, PAGE_SIZE - pageBufferIndex);
     noInterrupts();
     rp2040.idleOtherCore();
     flash_range_program(flashWriteIndex, pageBuffer, PAGE_SIZE);
